@@ -12,9 +12,9 @@ namespace WindowEngine
 
         public static void LoadData()
         {
-        grassTexture = new Texture("E:\\Курсачь\\TestFPAv1\\Texture\\grass.png");
-        woodplankTexture = new Texture("E:\\Курсачь\\TestFPAv1\\Texture\\woodplank.png");
-        skyTexture = new Texture("E:\\Курсачь\\TestFPAv1\\Texture\\sky.png");
+        grassTexture = new Texture("..\\..\\..\\Texture\\grass.png");
+        woodplankTexture = new Texture("..\\..\\..\\Texture\\woodplank.png");
+        skyTexture = new Texture("..\\..\\..\\Texture\\sky.png");
         }
 
 

@@ -1,13 +1,11 @@
-﻿
-
-using WindowEngine;
+﻿using WindowEngine;
 
 class Program
 {
     static void Main(string[] args)
     {
-        WindowEngine.MainWindow mainWindow = new WindowEngine.MainWindow();
         SettingFolder.LoadData();
+        WindowEngine.MainWindow mainWindow = new WindowEngine.MainWindow();
 
         while (mainWindow.window.IsOpen)
         {

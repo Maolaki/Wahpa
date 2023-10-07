@@ -19,7 +19,7 @@ namespace WindowEngine
             {
                 for (int y = 0; y < mapGrid.GetLength(1); y++)
                 {
-                    mapGrid[x, y] = new Tile('#');
+                    mapGrid[x, y] = new Tile();
 
                     mapGrid[x, y].sprite.Position = new Vector2f(x * SettingFolder.tileSize, y * SettingFolder.tileSize);
                 }

@@ -21,7 +21,6 @@ namespace WindowEngine
                     sprite = new Sprite(SettingFolder.skyTexture);
                     break;
             }
-            sprite.Scale = new Vector2f(SettingFolder.tileSize, SettingFolder.tileSize);
 
         }
     }
