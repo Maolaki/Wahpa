@@ -4,24 +4,27 @@ namespace WindowEngine
 {
     public static class MapGenerator
     {
-        public static int mapLength { get; set; }
-        public static int mapHeight { get; set; }
-        public static Tile[,] mapGrid { get; set; }
-
-        public static void CreateGrid(int length, int height)
+        public static Tile[,] mainLayer { get; set; }
+        
+        public static void CreateMainLayer(string[] map)
         {
-            mapLength = length;
-            mapHeight = height;
-
-            mapGrid = new Tile[length, height];
-
-            for (int x = 0; x < mapGrid.GetLength(0); x++)
+            char[,] charArray = new char[map[0].Length, map.Length];
+            for (int i = 0; i < map.Length; i++)
             {
-                for (int y = 0; y < mapGrid.GetLength(1); y++)
+                for (int j = 0; j < map[0].Length; j++)
                 {
-                    mapGrid[x, y] = new Tile();
+                    charArray[j, i] = map[i][j];
+                }
+            }
 
-                    mapGrid[x, y].sprite.Position = new Vector2f(x * SettingFolder.tileSize, y * SettingFolder.tileSize);
+            mainLayer = new Tile[charArray.GetLength(0), charArray.GetLength(1)];
+
+            for (int x = 0; x < mainLayer.GetLength(0); x++)
+            {
+                for (int y = 0; y < mainLayer.GetLength(1); y++)
+                {
+                    mainLayer[x, y] = new Tile(charArray[x, y]);
+                    mainLayer[x, y].sprite.Position = new Vector2f(x * SettingFolder.tileSize, y * SettingFolder.tileSize);
                 }
             }
         }

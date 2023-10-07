@@ -32,7 +32,7 @@ namespace WindowEngine
             circle2.Position = new Vector2f(10, 30);
             circle2.FillColor = Color.Red;
 
-            MapGenerator.CreateGrid(1000, 20);
+            MapGenerator.CreateMainLayer(File.ReadAllLines("..\\..\\..\\Maps\\Hub.txt"));
         }
 
         private void _Resized(object? sender, SizeEventArgs e)
@@ -56,11 +56,11 @@ namespace WindowEngine
 
             window.Clear(Color.Black);
 
-            for (int x = 0; x < MapGenerator.mapGrid.GetLength(0); x++)
+            for (int x = 0; x < MapGenerator.mainLayer.GetLength(0); x++)
             {
-                for (int y = 0; y < MapGenerator.mapGrid.GetLength(1); y++)
+                for (int y = 0; y < MapGenerator.mainLayer.GetLength(1); y++)
                 {
-                    window.Draw(MapGenerator.mapGrid[x,y].sprite);
+                    window.Draw(MapGenerator.mainLayer[x,y].sprite);
                 }
             }
 
@@ -72,7 +72,7 @@ namespace WindowEngine
 
 
 
-           // window.SetView(new View(circle.Position, new Vector2f(96 * (window.Size.X / 192), 54 * (window.Size.Y / 108))));
+           //window.SetView(new View(circle.Position, new Vector2f(96 * (window.Size.X / 192), 54 * (window.Size.Y / 108))));
         }
 
         public void Draw(RenderTarget target)

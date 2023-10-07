@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <Folder Include="MapGeneratorFolder\" />
+    <Folder Include="Maps\" />
     <Folder Include="ResourcesFolder\" />
     <Folder Include="NewFolder\" />
     <Folder Include="PhysicsFolder\" />
