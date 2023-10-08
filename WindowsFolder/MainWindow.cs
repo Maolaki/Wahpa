@@ -1,16 +1,16 @@
-﻿using SFML.Graphics;
+﻿using EntityEngine;
+using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
+using System.Security.Cryptography;
 
 namespace WindowEngine
 {
     class MainWindow
     {
         public RenderWindow window;
-        public View view;
-        Event lookEvent;
-        CircleShape circle;
-        CircleShape circle2;
+        private View view;
+        private Hero hero;
 
         public MainWindow()
         {
@@ -25,12 +25,7 @@ namespace WindowEngine
 
             ////////////////////////////////////////
 
-            circle = new CircleShape(20);
-            circle2 = new CircleShape(28);
-            circle.Position = new Vector2f(30, 30);
-            circle.FillColor = Color.Yellow;
-            circle2.Position = new Vector2f(10, 30);
-            circle2.FillColor = Color.Red;
+            hero = new Hero(150, 120);
 
             MapGenerator.CreateMainLayer(File.ReadAllLines("..\\..\\..\\Maps\\Hub.txt"));
         }
@@ -56,28 +51,22 @@ namespace WindowEngine
 
             window.Clear(Color.Black);
 
+            hero.Move();
+
+           window.SetView(new View(hero.sprite.Position, new Vector2f(96 * (window.Size.X / 192), 54 * (window.Size.Y / 108))));
+        }
+
+        public void Draw()
+        {
             for (int x = 0; x < MapGenerator.mainLayer.GetLength(0); x++)
             {
                 for (int y = 0; y < MapGenerator.mainLayer.GetLength(1); y++)
                 {
-                    window.Draw(MapGenerator.mainLayer[x,y].sprite);
+                    window.Draw(MapGenerator.mainLayer[x, y].sprite);
                 }
             }
 
-            circle.Position += new Vector2f(0.5f, 0);
-
-            circle2.Position += new Vector2f(0.8f, 0);
-            window.Draw(circle);
-            window.Draw(circle2);
-
-
-
-           //window.SetView(new View(circle.Position, new Vector2f(96 * (window.Size.X / 192), 54 * (window.Size.Y / 108))));
-        }
-
-        public void Draw(RenderTarget target)
-        {
-
+            window.Draw(hero.sprite);
         }
     }
 }

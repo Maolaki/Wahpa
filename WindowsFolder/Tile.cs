@@ -3,9 +3,10 @@ using SFML.System;
 
 namespace WindowEngine
 {
-    public class Tile
+    internal class Tile
     {
         public Sprite sprite { get; private set; } 
+        public SettingFolder.TileStatus status { get; private set; }
 
         public Tile(char textureKey = ' ')
         {
@@ -13,12 +14,15 @@ namespace WindowEngine
             {
                 case '@':
                     sprite = new Sprite(SettingFolder.woodplankTexture);
+                    status = SettingFolder.TileStatus.wall;
                     break;
                 case '#':
                     sprite = new Sprite(SettingFolder.grassTexture);
+                    status = SettingFolder.TileStatus.wall;
                     break;
                 default:
                     sprite = new Sprite(SettingFolder.skyTexture);
+                    status = SettingFolder.TileStatus.empty;
                     break;
             }
 

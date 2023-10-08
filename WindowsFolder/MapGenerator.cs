@@ -2,7 +2,7 @@
 
 namespace WindowEngine
 {
-    public static class MapGenerator
+    internal static class MapGenerator
     {
         public static Tile[,] mainLayer { get; set; }
         
