@@ -47,11 +47,11 @@ namespace WindowEngine
 
         public void Update()
         {
-            window.DispatchEvents();
+           window.DispatchEvents();
 
-            window.Clear(Color.Black);
+           window.Clear(Color.Black);
 
-            hero.Move();
+           hero.Update();
 
            window.SetView(new View(hero.sprite.Position, new Vector2f(96 * (window.Size.X / 192), 54 * (window.Size.Y / 108))));
         }

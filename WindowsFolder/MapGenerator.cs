@@ -1,5 +1,4 @@
 ﻿using SFML.System;
-
 namespace WindowEngine
 {
     internal static class MapGenerator
