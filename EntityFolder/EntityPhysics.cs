@@ -45,6 +45,7 @@ namespace EntityEngine
             coordinateY = (int)sprite.Position.Y;
             direction = Direction.right;
             prevDirection = Direction.right;
+            fallAcceleration = mass;
         }
 
         /////////////////////////////////////////////////////////////
@@ -201,8 +202,8 @@ namespace EntityEngine
 
         public void Fall()
         {
-            fallAcceleration *= SettingFolder.GRAVITATION_STRENGTH;
-            fallSpeed = mass * fallAcceleration;
+          //  fallAcceleration *= SettingFolder.GRAVITATION_STRENGTH;
+            fallSpeed = 7;
             coordinateY += CheckMoveableDown((int)fallSpeed);
 
         }
@@ -221,9 +222,9 @@ namespace EntityEngine
                 Fall();
                 if (CheckMoveableDown(1) == 0)
                 {
-                    fallAcceleration = SettingFolder.GRAVITATION_STRENGTH;
+                    fallAcceleration = mass;
                     status = Status.stand;
-                }    
+                }
             }
 
             sprite.Position = new Vector2f(coordinateX, coordinateY);

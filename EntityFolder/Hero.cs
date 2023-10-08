@@ -8,7 +8,7 @@ namespace EntityEngine
     {
         public int speed { get; set; }
 
-        public Hero(int coordX, int coordY) : base(coordX, coordY, 32, 48, 3, SettingFolder.heroStandingTexture)
+        public Hero(int coordX, int coordY) : base(coordX, coordY, 32, 48, 2, SettingFolder.heroStandingTexture)
         {
             this.speed = 1;
 
