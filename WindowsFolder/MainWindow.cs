@@ -2,13 +2,16 @@
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
-using System.Security.Cryptography;
 
 namespace WindowEngine
 {
     class MainWindow
     {
         public RenderWindow window;
+        public static Clock clock = new Clock();
+        private static Time pDeltaTime;
+        public static float deltaTime;
+
         private View view;
         private Hero hero;
 
@@ -27,7 +30,8 @@ namespace WindowEngine
 
             hero = new Hero(150, 120);
 
-            MapGenerator.CreateMainLayer(File.ReadAllLines("..\\..\\..\\Maps\\Hub.txt"));
+            MapGen.MapGenerator.LoadHub(File.ReadAllLines("..\\..\\..\\Maps\\Hub.txt"));
+           // MapGen.MapGenerator.LoadLevel1();
         }
 
         private void _Resized(object? sender, SizeEventArgs e)
@@ -47,7 +51,10 @@ namespace WindowEngine
 
         public void Update()
         {
-           window.DispatchEvents();
+           pDeltaTime = clock.Restart();
+           deltaTime = pDeltaTime.AsSeconds();
+
+            window.DispatchEvents();
 
            window.Clear(Color.Black);
 
@@ -58,11 +65,11 @@ namespace WindowEngine
 
         public void Draw()
         {
-            for (int x = 0; x < MapGenerator.mainLayer.GetLength(0); x++)
+            for (int x = 0; x < MapGen.MapGenerator.mainLayer.GetLength(0); x++)
             {
-                for (int y = 0; y < MapGenerator.mainLayer.GetLength(1); y++)
+                for (int y = 0; y < MapGen.MapGenerator.mainLayer.GetLength(1); y++)
                 {
-                    window.Draw(MapGenerator.mainLayer[x, y].sprite);
+                    window.Draw(MapGen.MapGenerator.mainLayer[x, y].sprite);
                 }
             }
 

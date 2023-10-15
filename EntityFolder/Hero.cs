@@ -8,28 +8,43 @@ namespace EntityEngine
     {
         public int speed { get; set; }
 
-        public Hero(int coordX, int coordY) : base(coordX, coordY, 32, 48, 2, SettingFolder.heroStandingTexture)
+        public Hero(int coordX, int coordY) : base(coordX, coordY, 32, 48, 2, Data.heroStandingTexture)
         {
             this.speed = 1;
 
         }
 
+        public bool IsJumpKeyPressed()
+        {
+            return Keyboard.IsKeyPressed(Keyboard.Key.W) || Keyboard.IsKeyPressed(Keyboard.Key.Space);
+        }
+
+        public bool IsLeftKeyPressed()
+        {
+            return Keyboard.IsKeyPressed(Keyboard.Key.A);
+        }
+
+        public bool IsRightKeyPressed()
+        {
+            return Keyboard.IsKeyPressed(Keyboard.Key.D);
+        }
+
         public void Move()
         {
-            if ((Keyboard.IsKeyPressed(Keyboard.Key.W) || Keyboard.IsKeyPressed(Keyboard.Key.Space)) && this.CheckMoveableDown(1) == 0)
+            if (IsJumpKeyPressed() && (status == Status.stand || status == Status.run))
             {
-                this.jumpSpeed = 8;
+                this.jumpSpeed = Data.JUMP_STRENGTH;
                 this.status = Status.jump;
             }
 
-            if (Keyboard.IsKeyPressed(Keyboard.Key.A))
+            if (IsLeftKeyPressed())
             {
                 this.MoveLeft(this.speed);
                 this.direction = Direction.left;
                 if (status == Status.stand)
                     status = Status.run;
-            } 
-            else if (Keyboard.IsKeyPressed(Keyboard.Key.D))
+            }
+            else if (IsRightKeyPressed())
             {
                 this.MoveRight(this.speed);
                 this.direction = Direction.right;
@@ -55,15 +70,15 @@ namespace EntityEngine
             //Анимации
             if (status == Status.stand)
             {
-                sprite.Texture = SettingFolder.heroStandingTexture;
+                sprite.Texture = Data.heroStandingTexture;
             } 
             else if (status == Status.run)
             {
-                sprite.Texture = SettingFolder.heroRunning1Texture;
+                sprite.Texture = Data.heroRunning1Texture;
             } 
             else if (status == Status.jump || status == Status.fall)
             {
-                sprite.Texture = SettingFolder.heroJumpingTexture;
+                sprite.Texture = Data.heroJumpingTexture;
             }
 
             //Направления

@@ -1,5 +1,6 @@
 ﻿using SFML.Graphics;
 using SFML.System;
+using SFML.Window;
 using WindowEngine;
 
 namespace EntityEngine
@@ -25,10 +26,6 @@ namespace EntityEngine
         public int sizeX { get; private set; }
         public int sizeY { get; private set; }
         public Sprite sprite { get; protected set; }
-        public float mass { get; protected set; }
-        private float fallAcceleration { get; set; }
-        private float fallSpeed { get; set; }
-        protected float jumpSpeed { get; set; }
         public Status status { get; protected set; }
         public Direction direction { get; protected set; }
         public Direction prevDirection { get; protected set; }
@@ -37,7 +34,6 @@ namespace EntityEngine
         {
             this.sizeX = sizeX;
             this.sizeY = sizeY;
-            this.mass = mass;
             sprite = new Sprite(texture);
             sprite.Origin = new Vector2f(0,0);
             sprite.Position = new Vector2f(coordX, coordY);
@@ -45,7 +41,6 @@ namespace EntityEngine
             coordinateY = (int)sprite.Position.Y;
             direction = Direction.right;
             prevDirection = Direction.right;
-            fallAcceleration = mass;
         }
 
         /////////////////////////////////////////////////////////////
@@ -58,10 +53,10 @@ namespace EntityEngine
             
             for (coordY = coordinateY - 1; coordY >= coordinateY - 1 - length; coordY -= 1)
             {
-                for (coordX = coordinateX; coordX <= coordinateX + sizeX; coordX += SettingFolder.tileSize)
+                for (coordX = coordinateX; coordX <= coordinateX + sizeX; coordX += Data.tileSize)
                 {
-                    Tile checkedTile = MapGenerator.mainLayer[(int)Math.Floor(coordX / (double)SettingFolder.tileSize), (int)Math.Floor(coordY / (double)SettingFolder.tileSize)];
-                    if (checkedTile.status == SettingFolder.TileStatus.wall)
+                    MapGen.Tile checkedTile = MapGen.MapGenerator.mainLayer[(int)Math.Floor(coordX / (double)Data.tileSize), (int)Math.Floor(coordY / (double)Data.tileSize)];
+                    if (checkedTile.type == MapGen.TileType.wall)
                         return moveableLength;
                 }
                 moveableLength++;
@@ -78,10 +73,10 @@ namespace EntityEngine
 
             for (coordY = coordinateY + sizeY; coordY <= coordinateY + sizeY + 1 + length; coordY += 1)
             {
-                for (coordX = coordinateX; coordX <= coordinateX + sizeX; coordX += SettingFolder.tileSize)
+                for (coordX = coordinateX; coordX <= coordinateX + sizeX; coordX += Data.tileSize)
                 {
-                    Tile checkedTile = MapGenerator.mainLayer[(int)Math.Floor(coordX / (double)SettingFolder.tileSize), (int)Math.Floor(coordY / (double)SettingFolder.tileSize)];
-                    if (checkedTile.status == SettingFolder.TileStatus.wall)
+                    MapGen.Tile checkedTile = MapGen.MapGenerator.mainLayer[(int)Math.Floor(coordX / (double)Data.tileSize), (int)Math.Floor(coordY / (double)Data.tileSize)];
+                    if (checkedTile.type == MapGen.TileType.wall || checkedTile.type == MapGen.TileType.platform)
                         return moveableLength;
                 }
                 moveableLength++;
@@ -96,12 +91,12 @@ namespace EntityEngine
             int coordY;
             int moveableLength = 0;
 
-            for (coordX = coordinateX - 1; coordX >= coordinateX - 1 - length; coordX -= 1)
+            for (coordX = coordinateX - 1 - 15; coordX >= coordinateX - 1 - length - 15; coordX -= 1)
             {
-                for (coordY = coordinateY; coordY < coordinateY + sizeY; coordY += SettingFolder.tileSize)
+                for (coordY = coordinateY; coordY < coordinateY + sizeY; coordY += Data.tileSize)
                 {
-                    Tile checkedTile = MapGenerator.mainLayer[(int)Math.Floor(coordX / (double)SettingFolder.tileSize), (int)Math.Floor(coordY / (double)SettingFolder.tileSize)];
-                    if (checkedTile.status == SettingFolder.TileStatus.wall)
+                    MapGen.Tile checkedTile = MapGen.MapGenerator.mainLayer[(int)Math.Ceiling(coordX / (double)Data.tileSize), (int)Math.Ceiling(coordY / (double)Data.tileSize)];
+                    if (checkedTile.type == MapGen.TileType.wall)
                         return moveableLength;
                 }
                 moveableLength++;
@@ -116,12 +111,12 @@ namespace EntityEngine
             int coordY;
             int moveableLength = 0;
 
-            for (coordX = coordinateX + sizeX + 1; coordX <= coordinateX + sizeX + 1 + length; coordX += 1)
+            for (coordX = coordinateX + sizeX + 1 - 15; coordX <= coordinateX + sizeX + 1 + length - 15; coordX += 1)
             {
-                for (coordY = coordinateY; coordY < coordinateY + sizeY; coordY += SettingFolder.tileSize)
+                for (coordY = coordinateY; coordY < coordinateY + sizeY; coordY += Data.tileSize)
                 {
-                    Tile checkedTile = MapGenerator.mainLayer[(int)Math.Floor(coordX / (double)SettingFolder.tileSize), (int)Math.Floor(coordY / (double)SettingFolder.tileSize)];
-                    if (checkedTile.status == SettingFolder.TileStatus.wall)
+                    MapGen.Tile checkedTile = MapGen.MapGenerator.mainLayer[(int)Math.Ceiling(coordX / (double)Data.tileSize), (int)Math.Ceiling(coordY / (double)Data.tileSize)];
+                    if (checkedTile.type == MapGen.TileType.wall)
                         return moveableLength;
                 }
                 moveableLength++;
@@ -188,47 +183,59 @@ namespace EntityEngine
 
         }
 
+        ////////////////////////////////////////////////
+
+        private float jumpHoldTime = 0f;
+        private float maxJumpHoldTime = 0.6f;
+        private float fallSpeed = 0;
+        protected float jumpSpeed = 0;
+
         public void Jump()
         {
-            if (jumpSpeed <= 0)
+            if ((Keyboard.IsKeyPressed(Keyboard.Key.W) || Keyboard.IsKeyPressed(Keyboard.Key.Space)) && jumpHoldTime < maxJumpHoldTime)
             {
-                status = Status.stand;
-                return;
+                jumpSpeed -= Data.GRAVITATION_STRENGTH * 0.5f;
+                jumpHoldTime += MainWindow.deltaTime;
             }
-            jumpSpeed -= 0.3f;
+            else
+            {
+                jumpSpeed -= Data.GRAVITATION_STRENGTH;
+                jumpHoldTime = maxJumpHoldTime;
+            }
+
             coordinateY -= CheckMoveableUp((int)jumpSpeed);
 
+            if (jumpSpeed <= 0)
+            {
+                status = Status.fall;
+                jumpHoldTime = 0f;
+            }
         }
 
         public void Fall()
         {
-          //  fallAcceleration *= SettingFolder.GRAVITATION_STRENGTH;
-            fallSpeed = 7;
+            fallSpeed += Data.GRAVITATION_STRENGTH;
             coordinateY += CheckMoveableDown((int)fallSpeed);
 
+            if (CheckMoveableDown(1) == 0)
+            {
+                status = Status.stand;
+                fallSpeed = 0;
+            }
         }
 
         ////////////////////////////////////////////////////////
-        
+
         public void UpdatePhysics()
         {
             if (status == Status.jump)
                 Jump();
 
-            if (CheckMoveableDown(1) != 0 && (status == Status.stand || status == Status.fall || status == Status.run || CheckMoveableUp(1) == 0)) // Надо бы пофиксить
-            {
-                status = Status.fall;
-
+            if (status == Status.fall || CheckMoveableDown(1) != 0 && (status == Status.stand || status == Status.run)) // Надо бы пофиксить
                 Fall();
-                if (CheckMoveableDown(1) == 0)
-                {
-                    fallAcceleration = mass;
-                    status = Status.stand;
-                }
-            }
+
 
             sprite.Position = new Vector2f(coordinateX, coordinateY);
-
         }
 
 

@@ -4,7 +4,7 @@ class Program
 {
     static void Main(string[] args)
     {
-        WindowEngine.MainWindow mainWindow = new WindowEngine.MainWindow();
+        MainWindow mainWindow = new WindowEngine.MainWindow();
 
         while (mainWindow.window.IsOpen)
         {
