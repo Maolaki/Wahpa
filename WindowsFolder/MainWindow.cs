@@ -7,7 +7,7 @@ namespace WindowEngine
 {
     class MainWindow
     {
-        public RenderWindow window;
+        public static RenderWindow window;
         public static Clock clock = new Clock();
         private static Time pDeltaTime;
         public static float deltaTime;
@@ -28,10 +28,10 @@ namespace WindowEngine
 
             ////////////////////////////////////////
 
-            hero = new Hero(150, 120);
+            //hero = new Hero(150, 150);
 
-            MapGen.MapGenerator.LoadHub(File.ReadAllLines("..\\..\\..\\Maps\\Hub.txt"));
-           // MapGen.MapGenerator.LoadLevel1();
+            //MapGen.MapGenerator.LoadHub();
+            MapGen.MapGenerator.LoadLevel(1);
         }
 
         private void _Resized(object? sender, SizeEventArgs e)
@@ -54,17 +54,27 @@ namespace WindowEngine
            pDeltaTime = clock.Restart();
            deltaTime = pDeltaTime.AsSeconds();
 
-            window.DispatchEvents();
+           window.DispatchEvents();
 
            window.Clear(Color.Black);
 
-           hero.Update();
+           //hero.Update();
 
-           window.SetView(new View(hero.sprite.Position, new Vector2f(96 * (window.Size.X / 192), 54 * (window.Size.Y / 108))));
+           //window.SetView(new View(hero.sprite.Position, new Vector2f(96 * (window.Size.X / 192), 54 * (window.Size.Y / 108))));
         }
 
         public void Draw()
         {
+            //for (int x = 0; x < MapGen.MapGenerator.mainLayer.GetLength(0); x++)
+            //{
+            //    for (int y = 0; y < MapGen.MapGenerator.mainLayer.GetLength(1); y++)
+            //    {
+            //        window.Draw(MapGen.MapGenerator.mainLayer[x, y].sprite);
+            //    }
+            //}
+
+            FloatRect visibleArea = new FloatRect(view.Center.X - view.Size.X / 2, view.Center.Y - view.Size.Y / 2, view.Size.X, view.Size.Y);
+
             for (int x = 0; x < MapGen.MapGenerator.mainLayer.GetLength(0); x++)
             {
                 for (int y = 0; y < MapGen.MapGenerator.mainLayer.GetLength(1); y++)
@@ -73,7 +83,7 @@ namespace WindowEngine
                 }
             }
 
-            window.Draw(hero.sprite);
+            //window.Draw(hero.sprite);
         }
     }
 }

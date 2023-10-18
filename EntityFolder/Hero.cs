@@ -56,6 +56,7 @@ namespace EntityEngine
                 if (status == Status.run)
                     status = Status.stand;
             }
+
         }
 
         //////////////////////////////////////////////////////////

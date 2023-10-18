@@ -13,8 +13,13 @@
 
   <ItemGroup>
     <Folder Include="Maps\" />
-    <Folder Include="MapTemplates\Level1Templates\CorridorYTemplates\" />
-    <Folder Include="MapTemplates\Level1Templates\CorridorXTemplates\" />
+    <Folder Include="MapTemplates\Level1Templates\four_two\" />
+    <Folder Include="MapTemplates\Level1Templates\five_five\" />
+    <Folder Include="MapTemplates\Level1Templates\three_two\" />
+    <Folder Include="MapTemplates\Level1Templates\two_two\" />
+    <Folder Include="MapTemplates\Level1Templates\two_one\" />
+    <Folder Include="MapTemplates\Level1Templates\one_five\" />
+    <Folder Include="MapTemplates\Level1Templates\one_one\" />
     <Folder Include="ResourcesFolder\" />
     <Folder Include="NewFolder\" />
     <Folder Include="PhysicsFolder\" />

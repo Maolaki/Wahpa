@@ -6,12 +6,12 @@ class Program
     {
         MainWindow mainWindow = new WindowEngine.MainWindow();
 
-        while (mainWindow.window.IsOpen)
+        while (WindowEngine.MainWindow.window.IsOpen)
         {
             mainWindow.Update();
 
             mainWindow.Draw();
-            mainWindow.window.Display();
+            WindowEngine.MainWindow.window.Display();
         }
 
         return;
