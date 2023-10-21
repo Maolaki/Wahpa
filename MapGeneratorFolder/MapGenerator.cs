@@ -19,7 +19,7 @@ namespace MapGen
 
     internal static class MapGenerator
     {
-        public static Chunk[,] Map { get; set; }
+        public static Chunk[,] chunkMap { get; set; }
         public static Tile[,] mainLayer { get; set; }
 
         public static void LoadHub()
@@ -32,7 +32,8 @@ namespace MapGen
             {
                 for (int y = 0; y < mainLayer.GetLength(1); y++)
                 {
-                    mainLayer[x, y] = new Tile(charArray[x, y]);
+                    mainLayer[x, y] = new Tile();
+                    mainLayer[x, y].SetTile(charArray[x, y]);
                     mainLayer[x, y].sprite.Position = new Vector2f(x * Data.tileSize, y * Data.tileSize);
                 }
             }
@@ -44,18 +45,22 @@ namespace MapGen
             {
                 case 1:
                     Level1Generator.Generate();
-                    mainLayer = new Tile[Map.GetLength(0) * 11, Map.GetLength(1) * 11];
+                    mainLayer = new Tile[chunkMap.GetLength(0) * 11, chunkMap.GetLength(1) * 11];
 
                     for (int x = 0; x < mainLayer.GetLength(0); x++)
                     {
                         for (int y = 0; y < mainLayer.GetLength(1); y++)
                         {
-                            if (Map[(int)Math.Floor(x / (double)11), (int)Math.Floor(y / (double)11)].type != ChunkType.empty)
-                                mainLayer[x, y] = new Tile(Map[(int)Math.Floor(x / (double)11), (int)Math.Floor(y / (double)11)].chunkPixelArray[x % 11, y % 11]);
+                            if (chunkMap[(int)Math.Floor(x / (double)11), (int)Math.Floor(y / (double)11)].type != ChunkType.empty && chunkMap[(int)Math.Floor(x / (double)11), (int)Math.Floor(y / (double)11)].chunkPixelArray[x % 11, y % 11] != ' ')
+                            {
+                                mainLayer[x, y] = new Tile();
+                                mainLayer[x, y].SetTile(chunkMap[(int)Math.Floor(x / (double)11), (int)Math.Floor(y / (double)11)].chunkPixelArray[x % 11, y % 11]);
+                                mainLayer[x, y].sprite.Position = new Vector2f(x * Data.tileSize, y * Data.tileSize);
+                            }      
                             else
-                                mainLayer[x, y] = new Tile('0');
-
-                            mainLayer[x, y].sprite.Position = new Vector2f(x * Data.tileSize, y * Data.tileSize);
+                            {
+                                mainLayer[x, y] = new Tile();
+                            }
                         }
                     }
 

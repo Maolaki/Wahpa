@@ -24,24 +24,29 @@ namespace MapGen
         public TileType type { get; set; }
         public TileGenType genType { get; set; }
 
-        public Tile(char textureKey = ' ')
+        public Tile()
         {
-            switch (textureKey)
+
+
+        }
+
+        public void SetTile(char type)
+        {
+            switch (type)
             {
                 case '@':
                     sprite = new Sprite(Data.woodplankTexture);
-                    type = TileType.platform;
+                    this.type = TileType.platform;
                     break;
                 case '#':
                     sprite = new Sprite(Data.grassTexture);
-                    type = TileType.wall;
+                    this.type = TileType.wall;
                     break;
                 default:
                     sprite = new Sprite(Data.skyTexture);
-                    type = TileType.empty;
+                    this.type = TileType.empty;
                     break;
             }
-
         }
     }
 }
