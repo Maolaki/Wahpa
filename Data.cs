@@ -6,8 +6,8 @@ public static class Data
     public const float GRAVITATION_STRENGTH = 0.2f;
     public const float JUMP_STRENGTH = 6f;
 
-    public const int LEVEL1_SIZEX = 50;
-    public const int LEVEL1_SIZEY = 50;
+    public const int LEVEL1_SIZEX = 100;
+    public const int LEVEL1_SIZEY = 100;
     public const int LEVEL1_CHUNK_SIZE = 11;
     public static readonly String LEVEL1_ONE_ONE = "..\\..\\..\\MapTemplates\\Level1Templates\\one_one\\1.txt";
     public static readonly String LEVEL1_ONE_FIVE = "..\\..\\..\\MapTemplates\\Level1Templates\\one_five\\1.txt";

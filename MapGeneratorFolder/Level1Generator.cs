@@ -4,11 +4,6 @@ namespace MapGen
 {
     internal static class Level1Generator
     {
-        public static List<Chunk> rightChanksUpdate { get; set; }
-        public static List<Chunk> leftChanksUpdate { get; set; }
-        public static List<Chunk> upChanksUpdate { get; set; }
-        public static List<Chunk> downChanksUpdate { get; set; }
-
         public static void Generate()
         {
             MapGenerator.chunkMap = new Chunk[Data.LEVEL1_SIZEX, Data.LEVEL1_SIZEY];
@@ -23,139 +18,90 @@ namespace MapGen
                 }
             }
 
-            rightChanksUpdate = new List<Chunk>();
-            leftChanksUpdate = new List<Chunk>();
-            upChanksUpdate = new List<Chunk>();
-            downChanksUpdate = new List<Chunk>();
-
             /////////////////////////////////////////////////////////
 
-            BasicGenerationMethods.BuildRoom(24,24,RoomSize.two_two);
+            BasicGenerationMethods.BuildRoom(24,24,RoomSize.one_one);
+            //BasicGenerationMethods.BuildRoom(0, 0, RoomSize.one_one);
 
             //Chunk spawn = MapGenerator.chunkMap[14, 14];
 
             //spawn.chunkPixelArray = BasicGenerationMethods.ReadMapPattern(Data.LEVEL1_ONE_ONE);
 
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 1; i++)
                 GenerateChunks();
         }
 
         public static void GenerateChunks()
         {
-            List<Chunk> rightChanksUpdateCopy = new List<Chunk>(rightChanksUpdate);
-            List<Chunk> leftChanksUpdateCopy = new List<Chunk>(leftChanksUpdate);
-            List<Chunk> upChanksUpdateCopy = new List<Chunk>(upChanksUpdate);
-            List<Chunk> downChanksUpdateCopy = new List<Chunk>(downChanksUpdate);
+            List<Chunk> rightChanksUpdateCopy = new List<Chunk>(MapGenerator.rightChanksUpdate);
 
             foreach (Chunk chunk in rightChanksUpdateCopy)
             {
                 if (MapGenerator.chunkMap[chunk.x + 1, chunk.y].type == ChunkType.main)
                 {
-                    for (int i = 1; i < 10; i++)
-                    {
-                        chunk.chunkPixelArray[10, i] = '0';
-                        MapGenerator.chunkMap[chunk.x + 1, chunk.y].chunkPixelArray[0, i] = '0';
-                    }
-
-                    rightChanksUpdate.Remove(chunk);
+                    BasicGenerationMethods.CreateExit(chunk, 1);
                 }
                 else if (BasicGenerationMethods.BuildRoomRight(chunk.x + 1, chunk.y, true))
                 {
-                    for (int i = 1; i < 10; i++)
-                    {
-                        chunk.chunkPixelArray[10, i] = '0';
-                        MapGenerator.chunkMap[chunk.x + 1, chunk.y].chunkPixelArray[0, i] = '0';
-                    }
-
-                    rightChanksUpdate.Remove(chunk);
+                    BasicGenerationMethods.CreateExit(chunk, 1);
                 }
                 else
                 {
-                    rightChanksUpdate.Remove(chunk);
+                    MapGenerator.rightChanksUpdate.Remove(chunk);
                 }
             }
+
+            List<Chunk> leftChanksUpdateCopy = new List<Chunk>(MapGenerator.leftChanksUpdate);
 
             foreach (Chunk chunk in leftChanksUpdateCopy)
             {
                 if (MapGenerator.chunkMap[chunk.x - 1, chunk.y].type == ChunkType.main)
                 {
-                    for (int i = 1; i < 10; i++)
-                    {
-                        chunk.chunkPixelArray[0, i] = '0';
-                        MapGenerator.chunkMap[chunk.x - 1, chunk.y].chunkPixelArray[10, i] = '0';
-                    }
-
-                    leftChanksUpdate.Remove(chunk);
+                    BasicGenerationMethods.CreateExit(chunk, 3);
                 }
                 else if (BasicGenerationMethods.BuildRoomLeft(chunk.x - 1, chunk.y, true))
                 {
-                    for (int i = 1; i < 10; i++)
-                    {
-                        chunk.chunkPixelArray[0, i] = '0';
-                        MapGenerator.chunkMap[chunk.x - 1, chunk.y].chunkPixelArray[10, i] = '0';
-                    }
-
-                    leftChanksUpdate.Remove(chunk);
+                    BasicGenerationMethods.CreateExit(chunk, 3);
                 }
                 else
                 {
-                    leftChanksUpdate.Remove(chunk);
+                    MapGenerator.leftChanksUpdate.Remove(chunk);
                 }
             }
+
+            List<Chunk> upChanksUpdateCopy = new List<Chunk>(MapGenerator.upChanksUpdate);
 
             foreach (Chunk chunk in upChanksUpdateCopy)
             {
                 if (MapGenerator.chunkMap[chunk.x, chunk.y - 1].type == ChunkType.main)
                 {
-                    for (int i = 1; i < 10; i++)
-                    {
-                        chunk.chunkPixelArray[i, 0] = '0';
-                        MapGenerator.chunkMap[chunk.x, chunk.y - 1].chunkPixelArray[i, 10] = '0';
-                    }
-
-                    upChanksUpdate.Remove(chunk);
+                    BasicGenerationMethods.CreateExit(chunk, 2);
                 }
                 else if (BasicGenerationMethods.BuildRoomUp(chunk.x, chunk.y - 1, true))
                 {
-                    for (int i = 1; i < 10; i++)
-                    {
-                        chunk.chunkPixelArray[i, 0] = '0';
-                        MapGenerator.chunkMap[chunk.x, chunk.y - 1].chunkPixelArray[i, 10] = '0';
-                    }
-
-                    upChanksUpdate.Remove(chunk);
+                    BasicGenerationMethods.CreateExit(chunk, 2);
                 }
                 else
                 {
-                    upChanksUpdate.Remove(chunk);
+                    MapGenerator.upChanksUpdate.Remove(chunk);
                 }
             }
+
+            List<Chunk> downChanksUpdateCopy = new List<Chunk>(MapGenerator.downChanksUpdate);
 
             foreach (Chunk chunk in downChanksUpdateCopy)
             {
                 if (MapGenerator.chunkMap[chunk.x, chunk.y + 1].type == ChunkType.main)
                 {
-                    for (int i = 1; i < 10; i++)
-                    {
-                        chunk.chunkPixelArray[i, 10] = '0';
-                        MapGenerator.chunkMap[chunk.x, chunk.y + 1].chunkPixelArray[i, 0] = '0';
-                    }
-
-                    downChanksUpdate.Remove(chunk);
+                    BasicGenerationMethods.CreateExit(chunk, 4);
                 }
                 else if (BasicGenerationMethods.BuildRoomDown(chunk.x, chunk.y + 1, true))
                 {
-                    for (int i = 1; i < 10; i++)
-                    {
-                        chunk.chunkPixelArray[i, 10] = '0';
-                        MapGenerator.chunkMap[chunk.x, chunk.y + 1].chunkPixelArray[i, 0] = '0';
-                    }
-
-                    downChanksUpdate.Remove(chunk);
+                    BasicGenerationMethods.CreateExit(chunk, 4);
                 }
                 else
                 {
-                    downChanksUpdate.Remove(chunk);
+                    MapGenerator.downChanksUpdate.Remove(chunk);
                 }
             }
         }

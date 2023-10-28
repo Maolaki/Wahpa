@@ -5,6 +5,32 @@ namespace MapGen
 {
     internal static class BasicGenerationMethods
     {
+        ///////////////////////////////////////////////////
+        // Dictionaries
+        public static Dictionary<RoomSize, (int SizeX, int SizeY, int Chance, String pixelArray)> roomSizesRightLeft = new Dictionary<RoomSize, (int SizeX, int SizeY, int Chance, String pixelArray)>
+        {
+            { RoomSize.empty, (0, 0, 0, Data.LEVEL1_ONE_ONE) },
+            { RoomSize.one_one, (1, 1, 1, Data.LEVEL1_ONE_ONE) },
+            { RoomSize.two_one, (2, 1 , 3 , Data.LEVEL1_TWO_ONE) },
+            { RoomSize.two_two, (2, 2, 3, Data.LEVEL1_TWO_TWO) },
+            { RoomSize.three_two, (3, 2 , 3, Data.LEVEL1_THREE_TWO ) },
+            { RoomSize.four_two, (4, 2 , 3, Data.LEVEL1_FOUR_TWO) },
+            { RoomSize.five_five, (5, 5, 3, Data.LEVEL1_FIVE_FIVE) }
+        };
+
+        public static Dictionary<RoomSize, (int SizeX, int SizeY, int Chance, String pixelArray)> roomSizesUpDown = new Dictionary<RoomSize, (int SizeX, int SizeY, int Chance, String pixelArray)>
+        {
+            { RoomSize.empty, (0, 0, 0, Data.LEVEL1_ONE_ONE) },
+            { RoomSize.one_one, (1, 1, 1, Data.LEVEL1_ONE_ONE) },
+            { RoomSize.one_five, (1, 5, 3, Data.LEVEL1_ONE_FIVE) },
+            { RoomSize.two_two, (2, 2, 3, Data.LEVEL1_TWO_TWO) },
+            { RoomSize.four_two, (4, 2, 3, Data.LEVEL1_FOUR_TWO) },
+            { RoomSize.five_five, (5, 5, 3, Data.LEVEL1_FIVE_FIVE) }
+        };
+
+        //////////////////////////////////////////////////////
+        // Basic Funs
+
         public static char[,] ReadMapPattern(String filePath)
         {
             string[] mapStringArray = File.ReadAllLines(filePath);
@@ -27,158 +53,124 @@ namespace MapGen
             {
                 for (int j = 0; j < roomDimensions.SizeY; j++)
                 {
-                    if (i == 0 && i == roomDimensions.SizeX - 1 && j == 0 && j == roomDimensions.SizeY - 1)
+                    if (i == 0)
                     {
-                        MapGenerator.chunkMap[startX + i, startY + j].border = RoomBorder.up_down_right_left;
-                        Level1Generator.upChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
-                        Level1Generator.downChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
-                        Level1Generator.rightChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
-                        Level1Generator.leftChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
+                        // влево
+                        Chunk chunk = MapGenerator.chunkMap[startX + i, startY + j];
+                        chunk.BorderLeft = true;
+                        MapGenerator.leftChanksUpdate.Add(chunk);
+
+                        if (MapGenerator.chunkMap[startX + i - 1, startY + j].type == ChunkType.main)
+                            CreateExit(chunk, 3);
                     }
 
-                    else if (i == 0 && i == roomDimensions.SizeX - 1 && j == 0)
+                    if (i == roomDimensions.SizeX - 1)
                     {
-                        MapGenerator.chunkMap[startX + i, startY + j].border = RoomBorder.up_right_left;
-                        Level1Generator.upChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
-                        Level1Generator.rightChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
-                        Level1Generator.leftChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
-                    }
-                    else if (i == 0 && i == roomDimensions.SizeX - 1 && j == roomDimensions.SizeY - 1)
-                    {
-                        MapGenerator.chunkMap[startX + i, startY + j].border = RoomBorder.down_right_left;
-                        Level1Generator.downChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
-                        Level1Generator.rightChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
-                        Level1Generator.leftChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
-                    }
-                    else if (i == 0 && j == 0 && j == roomDimensions.SizeY - 1)
-                    {
-                        MapGenerator.chunkMap[startX + i, startY + j].border = RoomBorder.up_down_right;
-                        Level1Generator.upChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
-                        Level1Generator.downChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
-                        Level1Generator.rightChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
-                    }
-                    else if (i == roomDimensions.SizeX - 1 && j == 0 && j == roomDimensions.SizeY - 1)
-                    {
-                        MapGenerator.chunkMap[startX + i, startY + j].border = RoomBorder.up_down_left;
-                        Level1Generator.upChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
-                        Level1Generator.downChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
-                        Level1Generator.leftChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
+                        // вправо
+                        Chunk chunk = MapGenerator.chunkMap[startX + i, startY + j];
+                        chunk.BorderRight = true;
+                        MapGenerator.rightChanksUpdate.Add(chunk);
+
+                        if (MapGenerator.chunkMap[startX + i + 1, startY + j].type == ChunkType.main)
+                            CreateExit(chunk, 1);
                     }
 
-                    else if (i == 0 && j == 0)
+                    if (j == 0)
                     {
-                        MapGenerator.chunkMap[startX + i, startY + j].border = RoomBorder.up_left;
-                        Level1Generator.upChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
-                        Level1Generator.leftChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
-                    }
-                    else if (i == 0 && j == roomDimensions.SizeY - 1)
-                    {
-                        MapGenerator.chunkMap[startX + i, startY + j].border = RoomBorder.down_left;
-                        Level1Generator.downChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
-                        Level1Generator.leftChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
-                    }
-                    else if (i == roomDimensions.SizeX - 1 && j == 0)
-                    {
-                        MapGenerator.chunkMap[startX + i, startY + j].border = RoomBorder.up_right;
-                        Level1Generator.upChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
-                        Level1Generator.rightChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
-                    }
-                    else if (i == roomDimensions.SizeX - 1 && j == roomDimensions.SizeY - 1)
-                    {
-                        MapGenerator.chunkMap[startX + i, startY + j].border = RoomBorder.down_right;
-                        Level1Generator.downChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
-                        Level1Generator.rightChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
+                        // вверх
+                        Chunk chunk = MapGenerator.chunkMap[startX + i, startY + j];
+                        chunk.BorderUp = true;
+                        MapGenerator.upChanksUpdate.Add(chunk);
+
+                        if (MapGenerator.chunkMap[startX + i, startY + j - 1].type == ChunkType.main)
+                            CreateExit(chunk, 2);
                     }
 
-                    else if (i == 0)
+                    if (j == roomDimensions.SizeY - 1)
                     {
-                        MapGenerator.chunkMap[startX + i, startY + j].border = RoomBorder.left;
-                        Level1Generator.leftChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
-                    }
-                    else if (i == roomDimensions.SizeX - 1)
-                    {
-                        MapGenerator.chunkMap[startX + i, startY + j].border = RoomBorder.right;
-                        Level1Generator.rightChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
-                    }
-                    else if (j == 0)
-                    {
-                        MapGenerator.chunkMap[startX + i, startY + j].border = RoomBorder.up;
-                        Level1Generator.upChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
-                    }
-                    else if (j == roomDimensions.SizeY - 1)
-                    {
-                        MapGenerator.chunkMap[startX + i, startY + j].border = RoomBorder.down;
-                        Level1Generator.downChanksUpdate.Add(MapGenerator.chunkMap[startX + i, startY + j]);
+                        // вниз
+                        Chunk chunk = MapGenerator.chunkMap[startX + i, startY + j];
+                        chunk.BorderDown = true;
+                        MapGenerator.downChanksUpdate.Add(chunk);
+
+                        if (MapGenerator.chunkMap[startX + i, startY + j + 1].type == ChunkType.main)
+                            CreateExit(chunk, 4);
                     }
 
-                    else
-                    {
-                        MapGenerator.chunkMap[startX + i, startY + j].border = RoomBorder.none;
-                    }
 
                 }
             }
         }
-        
-        public static void SetColumn(int x, int y1, int y2, Texture texture, TileType tileType)
-        {
-            for (int i = y1; i != y2; i++)
-            {
-                MapGenerator.mainLayer[x, i].sprite.Texture = texture;
-                MapGenerator.mainLayer[x, i].type = tileType;
-            }
-        }
 
-        public static void SetLine(int x1, int x2, int y, Texture texture, TileType tileType)
+        public static void CreateExit(Chunk chunk, int route)
         {
-            for (int i = x1; i != x2; i++)
+            switch (route)
             {
-                MapGenerator.mainLayer[i, y].sprite.Texture = texture;
-                MapGenerator.mainLayer[i, y].type = tileType;
-            }
-        }
-
-        public static void FillPart(int x1, int x2, int y1, int y2, Texture texture, TileType tileType)
-        {
-            for (int i = x1; i != x2; i++)
-            {
-                for (int j = y1; j != y2; j++)
-                {
-                    if (MapGenerator.mainLayer[i, j].genType == TileGenType.freeGen)
+                case 1:
+                    for (int i = 1; i < 10; i++)
                     {
-                        MapGenerator.mainLayer[i, j].sprite.Texture = texture;
-                        MapGenerator.mainLayer[i, j].genType = TileGenType.wallGen;
-                        MapGenerator.mainLayer[i, j].type = TileType.wall;
-
+                        // вправо 
+                        chunk.chunkPixelArray[10, i] = '@';
+                        MapGenerator.chunkMap[chunk.x + 1, chunk.y].chunkPixelArray[0, i] = '@';
+                        MapGenerator.rightChanksUpdate.Remove(chunk);
+                        MapGenerator.leftChanksUpdate.Remove(MapGenerator.chunkMap[chunk.x + 1, chunk.y]);
                     }
-
-                }
+                    break;
+                case 2:
+                    for (int i = 1; i < 10; i++)
+                    {
+                        // вверх
+                        chunk.chunkPixelArray[i, 0] = '@';
+                        MapGenerator.chunkMap[chunk.x, chunk.y - 1].chunkPixelArray[i, 10] = '@';
+                        MapGenerator.upChanksUpdate.Remove(chunk);
+                        MapGenerator.downChanksUpdate.Remove(MapGenerator.chunkMap[chunk.x, chunk.y - 1]);
+                    }
+                    break;
+                case 3:
+                    for (int i = 1; i < 10; i++)
+                    {
+                        // влево
+                        chunk.chunkPixelArray[0, i] = '@';
+                        MapGenerator.chunkMap[chunk.x - 1, chunk.y].chunkPixelArray[10, i] = '@';
+                        MapGenerator.leftChanksUpdate.Remove(chunk);
+                        MapGenerator.rightChanksUpdate.Remove(MapGenerator.chunkMap[chunk.x - 1, chunk.y]);
+                    }
+                    break;
+                case 4:
+                    for (int i = 1; i < 10; i++)
+                    {
+                        // вниз
+                        chunk.chunkPixelArray[i, 10] = '@';
+                        MapGenerator.chunkMap[chunk.x, chunk.y + 1].chunkPixelArray[i, 0] = '@';
+                        MapGenerator.downChanksUpdate.Remove(chunk);
+                        MapGenerator.upChanksUpdate.Remove(MapGenerator.chunkMap[chunk.x, chunk.y + 1]);
+                    }
+                    break;
             }
+
         }
 
         ///////////////////////////////////////////////// 
-        // Check Code 
-        // 3е слово указывает но то, куда относительно чанка идет проверка, проверяется вниз
+        // Check chunks 
 
-        public static void CheckXYRight(int x, int y, out int SizeX, out int SizeYUp, out int SizeYDown)
+        public static void CheckXYRight(int startX, int startY, out int sizeX, out int sizeYUp, out int sizeYDown)
         {
-            Chunk currectChunk = MapGenerator.chunkMap[x, y];
             int maxJUp = 4;
             int maxJDown = 4;
 
             for (int i = 0; i < 5; i++)
             {
-                if (MapGenerator.chunkMap[x + i, y].type != ChunkType.empty)
+                if (MapGenerator.chunkMap[startX + i, startY].type != ChunkType.empty)
                 {
-                    SizeX = i;
-                    SizeYUp = maxJUp;
-                    SizeYDown = maxJDown;
+                    sizeX = i;
+                    sizeYUp = maxJUp;
+                    sizeYDown = maxJDown;
                     return;
                 }
 
                 for (int j = 1; j <= 4; j++)
                 {
-                    if (MapGenerator.chunkMap[x + i, y - j].type != ChunkType.empty)
+                    if (MapGenerator.chunkMap[startX + i, startY - j].type != ChunkType.empty)
                     {
                         if (maxJUp > j)
                             maxJUp = j - 1;
@@ -189,7 +181,7 @@ namespace MapGen
 
                 for (int j = 1; j <= 4; j++)
                 {
-                    if (MapGenerator.chunkMap[x + i, y + j].type != ChunkType.empty)
+                    if (MapGenerator.chunkMap[startX + i, startY + j].type != ChunkType.empty)
                     {
                         if (maxJDown > j)
                             maxJDown = j - 1;
@@ -199,30 +191,29 @@ namespace MapGen
                 }
             }
 
-            SizeX = 5;
-            SizeYUp = maxJUp;
-            SizeYDown = maxJDown;
+            sizeX = 5;
+            sizeYUp = maxJUp;
+            sizeYDown = maxJDown;
         }
 
-        public static void CheckXYLeft(int x, int y, out int SizeX, out int SizeYUp, out int SizeYDown)
+        public static void CheckXYLeft(int startX, int startY, out int sizeX, out int sizeYUp, out int sizeYDown)
         {
-            Chunk currectChunk = MapGenerator.chunkMap[x, y];
             int maxJUp = 4;
             int maxJDown = 4;
 
             for (int i = 0; i < 5; i++)
             {
-                if (MapGenerator.chunkMap[x - i, y].type != ChunkType.empty)
+                if (MapGenerator.chunkMap[startX - i, startY].type != ChunkType.empty)
                 {
-                    SizeX = i;
-                    SizeYUp = maxJUp;
-                    SizeYDown = maxJDown;
+                    sizeX = i;
+                    sizeYUp = maxJUp;
+                    sizeYDown = maxJDown;
                     return;
                 }
 
                 for (int j = 1; j <= 4; j++)
                 {
-                    if (MapGenerator.chunkMap[x - i, y - j].type != ChunkType.empty)
+                    if (MapGenerator.chunkMap[startX - i, startY - j].type != ChunkType.empty)
                     {
                         if (maxJUp > j)
                             maxJUp = j - 1;
@@ -233,7 +224,7 @@ namespace MapGen
 
                 for (int j = 1; j <= 4; j++)
                 {
-                    if (MapGenerator.chunkMap[x - i, y + j].type != ChunkType.empty)
+                    if (MapGenerator.chunkMap[startX - i, startY + j].type != ChunkType.empty)
                     {
                         if (maxJDown > j)
                             maxJDown = j - 1;
@@ -243,31 +234,30 @@ namespace MapGen
                 }
             }
 
-            SizeX = 5;
-            SizeYUp = maxJUp;
-            SizeYDown = maxJDown;
+            sizeX = 5;
+            sizeYUp = maxJUp;
+            sizeYDown = maxJDown;
         }
 
-        public static void CheckXYUp(int x, int y, out int SizeY, out int SizeXRight, out int SizeXLeft)
+        public static void CheckXYUp(int startX, int startY, out int sizeY, out int sizeXRight, out int sizeXLeft)
         {
-            Chunk currectChunk = MapGenerator.chunkMap[x, y];
             int maxIRight = 4;
             int maxILeft = 4;
 
             for (int j = 0; j < 5; j++)
             {
-                if (MapGenerator.chunkMap[x, y - j].type != ChunkType.empty)
+                if (MapGenerator.chunkMap[startX, startY - j].type != ChunkType.empty)
                 {
-                    SizeY = j;
-                    SizeXRight = maxIRight;
-                    SizeXLeft = maxILeft;
+                    sizeY = j;
+                    sizeXRight = maxIRight;
+                    sizeXLeft = maxILeft;
 
                     return;
                 }
 
                 for (int i = 1; i <= 4; i++)
                 {
-                    if (MapGenerator.chunkMap[x + i, y - j].type != ChunkType.empty)
+                    if (MapGenerator.chunkMap[startX + i, startY - j].type != ChunkType.empty)
                     {
                         if (maxIRight >= i)
                             maxIRight = i - 1;
@@ -278,7 +268,7 @@ namespace MapGen
 
                 for (int i = 1; i <= 4; i++)
                 {
-                    if (MapGenerator.chunkMap[x - i, y - j].type != ChunkType.empty)
+                    if (MapGenerator.chunkMap[startX - i, startY - j].type != ChunkType.empty)
                     {
                         if (maxILeft >= i)
                             maxILeft = i - 1;
@@ -288,30 +278,30 @@ namespace MapGen
                 }
             }
 
-            SizeY = 5;
-            SizeXRight = maxIRight;
-            SizeXLeft = maxILeft;
+            sizeY = 5;
+            sizeXRight = maxIRight;
+            sizeXLeft = maxILeft;
         }
 
-        public static void CheckXYDown(int x, int y, out int SizeY, out int SizeXRight, out int SizeXLeft)
+        public static void CheckXYDown(int startX, int startY, out int sizeY, out int sizeXRight, out int sizeXLeft)
         {
-            Chunk currectChunk = MapGenerator.chunkMap[x, y];
             int maxIRight = 4;
             int maxILeft = 4;
 
             for (int j = 0; j < 5; j++)
             {
-                if (MapGenerator.chunkMap[x, y + j].type != ChunkType.empty)
+                if (MapGenerator.chunkMap[startX, startY + j].type != ChunkType.empty)
                 {
-                    SizeY = j;
-                    SizeXRight = maxIRight;
-                    SizeXLeft = maxILeft;
+                    sizeY = j;
+                    sizeXRight = maxIRight;
+                    sizeXLeft = maxILeft;
+
                     return;
                 }
 
                 for (int i = 1; i <= 4; i++)
                 {
-                    if (MapGenerator.chunkMap[x + i, y + j].type != ChunkType.empty)
+                    if (MapGenerator.chunkMap[startX + i, startY + j].type != ChunkType.empty)
                     {
                         if (maxIRight > i)
                             maxIRight = i - 1;
@@ -322,7 +312,7 @@ namespace MapGen
 
                 for (int i = 1; i <= 4; i++)
                 {
-                    if (MapGenerator.chunkMap[x - i, y + j].type != ChunkType.empty)
+                    if (MapGenerator.chunkMap[startX - i, startY + j].type != ChunkType.empty)
                     {
                         if (maxILeft > i)
                             maxILeft = i - 1;
@@ -332,48 +322,28 @@ namespace MapGen
                 }
             }
 
-            SizeY = 5;
-            SizeXRight = maxIRight;
-            SizeXLeft = maxILeft;
+            sizeY = 5;
+            sizeXRight = maxIRight;
+            sizeXLeft = maxILeft;
         }
 
         ////////////////////////////////////////
-        /// Choose Code
+        /// Choose room
 
-        public static Dictionary<RoomSize, (int SizeX, int SizeY, int Chance, String pixelArray)> roomSizesRightLeft = new Dictionary<RoomSize, (int SizeX, int SizeY, int Chance, String pixelArray)>
-        {
-            { RoomSize.empty, (0, 0, 3, Data.LEVEL1_ONE_ONE) },
-            { RoomSize.one_one, (1, 1, 1, Data.LEVEL1_ONE_ONE) },
-            { RoomSize.two_one, (2, 1 , 1 , Data.LEVEL1_TWO_ONE) },
-            { RoomSize.two_two, (2, 2, 1, Data.LEVEL1_TWO_TWO) },
-            { RoomSize.three_two, (3, 2 , 1 , Data.LEVEL1_THREE_TWO ) },
-            { RoomSize.four_two, (4, 2 , 1 , Data.LEVEL1_FOUR_TWO) },
-            { RoomSize.five_five, (5, 5, 1, Data.LEVEL1_FIVE_FIVE) }
-        };
-
-        public static Dictionary<RoomSize, (int SizeX, int SizeY, int Chance, String pixelArray)> roomSizesUpDown = new Dictionary<RoomSize, (int SizeX, int SizeY, int Chance, String pixelArray)>
-        {
-            { RoomSize.empty, (0, 0, 3, Data.LEVEL1_ONE_ONE) },
-            { RoomSize.one_five, (1, 5, 3, Data.LEVEL1_ONE_FIVE) },
-            { RoomSize.two_two, (2, 2, 5, Data.LEVEL1_TWO_TWO) },
-            { RoomSize.four_two, (4, 2, 8, Data.LEVEL1_FOUR_TWO) },
-            { RoomSize.five_five, (5, 5, 4, Data.LEVEL1_FIVE_FIVE) }
-        };
-
-        public static RoomSize ChooseRoomRightLeft(int x, int y, out int SizeYUp, out int SizeYDown, bool isRight)
+        public static RoomSize ChooseRoomRightLeft(int startX, int startY, out int sizeYUp, out int sizeYDown, bool isRight)
         {
             Random random = new Random();
-            int SizeX;
-            int SizeY;
+            int sizeX;
+            int sizeY;
 
             if (isRight)
-                CheckXYRight(x, y, out SizeX, out SizeYUp, out SizeYDown);
+                CheckXYRight(startX, startY, out sizeX, out sizeYUp, out sizeYDown);
             else
-                CheckXYLeft(x, y, out SizeX, out SizeYUp, out SizeYDown);
+                CheckXYLeft(startX, startY, out sizeX, out sizeYUp, out sizeYDown);
 
-            SizeY = SizeYUp + SizeYDown + 1;
+            sizeY = sizeYUp + sizeYDown + 1;
 
-            var availableRoomSizes = roomSizesRightLeft.Where(rs => SizeX >= rs.Value.SizeX && SizeY >= rs.Value.SizeY).ToList();
+            var availableRoomSizes = roomSizesRightLeft.Where(rs => sizeX >= rs.Value.SizeX && sizeY >= rs.Value.SizeY).ToList();
 
             int totalChance = availableRoomSizes.Sum(rs => rs.Value.Chance);
             int randomChance = random.Next(totalChance);
@@ -389,20 +359,20 @@ namespace MapGen
             throw new InvalidOperationException("Не удалось выбрать комнату");
         }
 
-        public static RoomSize ChooseRoomUpDown(int x, int y, out int SizeXRight, out int SizeXLeft, bool isUp)
+        public static RoomSize ChooseRoomUpDown(int startX, int startY, out int sizeXRight, out int sizeXLeft, bool isUp)
         {
             Random random = new Random();
-            int SizeX;
-            int SizeY;
+            int sizeX;
+            int sizeY;
 
             if (isUp)
-                CheckXYUp(x, y, out SizeY, out SizeXRight, out SizeXLeft);
+                CheckXYUp(startX, startY, out sizeY, out sizeXRight, out sizeXLeft);
             else
-                CheckXYDown(x, y, out SizeY, out SizeXRight, out SizeXLeft);
+                CheckXYDown(startX, startY, out sizeY, out sizeXRight, out sizeXLeft);
 
-            SizeX = SizeXRight + SizeXLeft + 1;
+            sizeX = sizeXRight + sizeXLeft + 1;
 
-            var availableRoomSizes = roomSizesUpDown.Where(rs => SizeX >= rs.Value.SizeX && SizeY >= rs.Value.SizeY).ToList();
+            var availableRoomSizes = roomSizesUpDown.Where(rs => sizeX >= rs.Value.SizeX && sizeY >= rs.Value.SizeY).ToList();
 
             int totalChance = availableRoomSizes.Sum(rs => rs.Value.Chance);
             int randomChance = random.Next(totalChance);
@@ -434,25 +404,13 @@ namespace MapGen
                     MapGenerator.chunkMap[startX + i, startY + j].type = ChunkType.main;
                     MapGenerator.chunkMap[startX + i, startY + j].size = roomSize;
 
-                    int psevdoI;
-                    if (i > 0)
-                        psevdoI = i * 11;
-                    else
-                        psevdoI = 0;
-
-                    int psevdoJ;
-                    if (j > 0)
-                        psevdoJ = j * 11;
-                    else
-                        psevdoJ = 0;
-
                     char[,] chunkPixelArray = new char[11, 11];
 
                     for (int k = 0; k < 11; k++)
                     {
                         for (int l = 0; l < 11; l++)
                         {
-                            chunkPixelArray[k, l] = patternArray[psevdoI + k, psevdoJ + l];
+                            chunkPixelArray[k, l] = patternArray[i * 11 + k, j * 11 + l];
                         }
                     }
 
@@ -473,6 +431,7 @@ namespace MapGen
 
             if (roomSize == RoomSize.empty)
             {
+                MapGenerator.rightChanksUpdate.Remove(MapGenerator.chunkMap[startX,startY]);
                 return false;
             }
 
@@ -480,47 +439,35 @@ namespace MapGen
             char[,] patternArray = ReadMapPattern(roomDimensions.pixelArray);
 
             List<int> possibleStartPoints = new List<int>();
-            for (int i = 0; i < roomDimensions.SizeY; i++)
+            for (int i = 0; i < roomDimensions.SizeY && i <= SizeYUp; i++)
             {
                 if (i + SizeYDown + 1 >= roomDimensions.SizeY)
                 {
-                    possibleStartPoints.Add(startY + i);
+                    possibleStartPoints.Add(startY - i);
                 }
             }
 
             Random random = new Random();
             int randomStartY = possibleStartPoints[random.Next(possibleStartPoints.Count)];
 
-            for (int i = 0; i < roomDimensions.SizeX && i <= SizeYUp; i++)
+            for (int i = 0; i < roomDimensions.SizeX; i++)
             {
                 for (int j = 0; j < roomDimensions.SizeY; j++)
                 {
-                    MapGenerator.chunkMap[startX + i, randomStartY - j].type = chunkType;
-                    MapGenerator.chunkMap[startX + i, randomStartY - j].size = roomSize;
+                    MapGenerator.chunkMap[startX + i, randomStartY + j].type = chunkType;
+                    MapGenerator.chunkMap[startX + i, randomStartY + j].size = roomSize;
 
-                    int psevdoI;
-                    if (i > 0)
-                        psevdoI = i * 11;
-                    else
-                        psevdoI = 0;
-
-                    int psevdoJ;
-                    if (j > 0)
-                        psevdoJ = j * 11;
-                    else
-                        psevdoJ = 0;
-
-                    char[,] chunkPixelArray = new char[11, 11];
+                    char[,] chunkTilesArray = new char[11, 11];
 
                     for (int k = 0; k < 11; k++)
                     {
                         for (int l = 0; l < 11; l++)
                         {
-                            chunkPixelArray[k, l] = patternArray[psevdoI + k, psevdoJ + l];
+                            chunkTilesArray[k, l] = patternArray[i * 11 + k, j * 11 + l];
                         }
                     }
 
-                    MapGenerator.chunkMap[startX + i, randomStartY - (roomDimensions.SizeY - 1 - j)].chunkPixelArray = chunkPixelArray;
+                    MapGenerator.chunkMap[startX + i, randomStartY + j].chunkPixelArray = chunkTilesArray;
                 }
             }
             SetBorderAndArray(roomDimensions, startX, randomStartY);
@@ -538,6 +485,7 @@ namespace MapGen
 
             if (roomSize == RoomSize.empty)
             {
+                MapGenerator.rightChanksUpdate.Remove(MapGenerator.chunkMap[startX, startY]);
                 return false;
             }
 
@@ -549,7 +497,7 @@ namespace MapGen
             {
                 if (i + SizeYDown + 1 >= roomDimensions.SizeY)
                 {
-                    possibleStartPoints.Add(startY + i);
+                    possibleStartPoints.Add(startY - i);
                 }
             }
 
@@ -560,20 +508,8 @@ namespace MapGen
             {
                 for (int j = 0; j < roomDimensions.SizeY; j++)
                 {
-                    MapGenerator.chunkMap[startX + i - roomDimensions.SizeX + 1, randomStartY - j].type = chunkType;
-                    MapGenerator.chunkMap[startX + i - roomDimensions.SizeX + 1, randomStartY - j].size = roomSize;
-
-                    int psevdoI;
-                    if (i > 0)
-                        psevdoI = i * 11;
-                    else
-                        psevdoI = 0;
-
-                    int psevdoJ;
-                    if (j > 0)
-                        psevdoJ = j * 11;
-                    else
-                        psevdoJ = 0;
+                    MapGenerator.chunkMap[startX + i - roomDimensions.SizeX + 1, randomStartY + j].type = chunkType;
+                    MapGenerator.chunkMap[startX + i - roomDimensions.SizeX + 1, randomStartY + j].size = roomSize;
 
                     char[,] chunkPixelArray = new char[11, 11];
 
@@ -581,11 +517,11 @@ namespace MapGen
                     {
                         for (int l = 0; l < 11; l++)
                         {
-                            chunkPixelArray[k, l] = patternArray[psevdoI + k, psevdoJ + l];
+                            chunkPixelArray[k, l] = patternArray[i * 11 + k, j * 11 + l];
                         }
                     }
 
-                    MapGenerator.chunkMap[startX + i - roomDimensions.SizeX + 1, randomStartY - (roomDimensions.SizeY - 1 - j)].chunkPixelArray = chunkPixelArray;
+                    MapGenerator.chunkMap[startX + i - roomDimensions.SizeX + 1, randomStartY + j].chunkPixelArray = chunkPixelArray;
                 }
             }
             SetBorderAndArray(roomDimensions, startX - roomDimensions.SizeX + 1, randomStartY);
@@ -603,6 +539,7 @@ namespace MapGen
 
             if (roomSize == RoomSize.empty)
             {
+                MapGenerator.rightChanksUpdate.Remove(MapGenerator.chunkMap[startX, startY]);
                 return false;
             }
 
@@ -628,25 +565,13 @@ namespace MapGen
                     MapGenerator.chunkMap[randomStartX + i, startY - j].type = chunkType;
                     MapGenerator.chunkMap[randomStartX + i, startY - j].size = roomSize;
 
-                    int psevdoI;
-                    if (i > 0)
-                        psevdoI = i * 11;
-                    else
-                        psevdoI = 0;
-
-                    int psevdoJ;
-                    if (roomDimensions.SizeY - 1 - j > 0)
-                        psevdoJ = (roomDimensions.SizeY - 1 - j) * 11;
-                    else
-                        psevdoJ = 0;
-
                     char[,] chunkPixelArray = new char[11, 11];
 
                     for (int k = 0; k < 11; k++)
                     {
                         for (int l = 0; l < 11; l++)
                         {
-                            chunkPixelArray[k, l] = patternArray[psevdoI + k, psevdoJ + l];
+                            chunkPixelArray[k, l] = patternArray[i * 11 + k, (roomDimensions.SizeY - 1 - j) * 11 + l];
                         }
                     }
 
@@ -668,6 +593,7 @@ namespace MapGen
 
             if (roomSize == RoomSize.empty)
             {
+                MapGenerator.rightChanksUpdate.Remove(MapGenerator.chunkMap[startX, startY]);
                 return false;
             }
 
@@ -693,25 +619,13 @@ namespace MapGen
                     MapGenerator.chunkMap[randomStartX + i, startY + j].type = chunkType;
                     MapGenerator.chunkMap[randomStartX + i, startY + j].size = roomSize;
 
-                    int psevdoI;
-                    if (i > 0)
-                        psevdoI = i * 11;
-                    else
-                        psevdoI = 0;
-
-                    int psevdoJ;
-                    if (j > 0)
-                        psevdoJ = j * 11;
-                    else
-                        psevdoJ = 0;
-
                     char[,] chunkPixelArray = new char[11, 11];
 
                     for (int k = 0; k < 11; k++)
                     {
                         for (int l = 0; l < 11; l++)
                         {
-                            chunkPixelArray[k, l] = patternArray[psevdoI + k, psevdoJ + l];
+                            chunkPixelArray[k, l] = patternArray[i * 11 + k, j * 11 + l];
                         }
                     }
 

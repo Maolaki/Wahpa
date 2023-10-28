@@ -10,44 +10,19 @@ namespace MapGen
         extra
     }
 
-    enum RoomBorder
-    {
-        none,
-        up,
-        down,
-        right,
-        left,
-        up_right,
-        up_left,
-        down_right,
-        down_left,
-        up_right_left,
-        down_right_left,
-        up_down_left,
-        up_down_right,
-        up_down_right_left
-    }
-
-    enum Exit
-    {
-        none,
-        up,
-        down,
-        left,
-        right,
-        up_left,
-        up_right,
-        down_left,
-        down_right
-    }
-
     internal class Chunk
     {
         public int x {  get; set; }
         public int y { get; set; }
         public ChunkType type {  get; set; }
-        public Exit exit { get; set; }
-        public RoomBorder border { get; set; }
+        public bool BorderUp { get; set; }
+        public bool BorderDown { get; set; }
+        public bool BorderLeft { get; set; }
+        public bool BorderRight { get; set; }
+        public bool ExitUp { get; set; }
+        public bool ExitDown { get; set; }
+        public bool ExitLeft { get; set; }
+        public bool ExitRight { get; set; }
         public RoomSize size { get; set; }
         public char[,] chunkPixelArray { get; set; }
         public CircleShape shape { get; set; }
@@ -57,8 +32,14 @@ namespace MapGen
             x = 0;
             y = 0;
             type = ChunkType.empty;
-            exit = Exit.none;
-            border = RoomBorder.none;
+            BorderUp = false;
+            BorderDown = false;
+            BorderLeft = false;
+            BorderRight = false;
+            ExitUp = false;
+            ExitDown = false;
+            ExitLeft = false;
+            ExitRight = false;
             size = RoomSize.empty;
             chunkPixelArray = new char[Data.LEVEL1_CHUNK_SIZE, Data.LEVEL1_CHUNK_SIZE];
             shape = new CircleShape();

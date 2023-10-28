@@ -8,6 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="NewFolder\**" />
+    <EmbeddedResource Remove="NewFolder\**" />
+    <None Remove="NewFolder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="SFML.Net" Version="2.5.1" />
   </ItemGroup>
 
@@ -21,7 +27,6 @@
     <Folder Include="MapTemplates\Level1Templates\one_five\" />
     <Folder Include="MapTemplates\Level1Templates\one_one\" />
     <Folder Include="ResourcesFolder\" />
-    <Folder Include="NewFolder\" />
     <Folder Include="PhysicsFolder\" />
   </ItemGroup>
 

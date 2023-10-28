@@ -1,4 +1,5 @@
-﻿using SFML.Graphics;
+﻿using MapGen;
+using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
 
@@ -31,6 +32,12 @@ namespace EntityEngine
 
         public void Move()
         {
+            if (Keyboard.IsKeyPressed(Keyboard.Key.N))
+            {
+                Level1Generator.GenerateChunks();
+                MapGenerator.UpdateMap();
+            }
+
             if (IsJumpKeyPressed() && (status == Status.stand || status == Status.run))
             {
                 this.jumpSpeed = Data.JUMP_STRENGTH;

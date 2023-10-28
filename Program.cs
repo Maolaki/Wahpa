@@ -11,7 +11,7 @@ class Program
             mainWindow.Update();
 
             mainWindow.Draw();
-            WindowEngine.MainWindow.window.Display();
+            MainWindow.window.Display();
         }
 
         return;
