@@ -7,7 +7,8 @@ namespace MapGen
     {
         empty,
         wall,
-        platform
+        platform,
+        teleport
             
     }
 
@@ -24,12 +25,6 @@ namespace MapGen
         public TileType type { get; set; }
         public TileGenType genType { get; set; }
 
-        public Tile()
-        {
-
-
-        }
-
         public void SetTile(char type)
         {
             switch (type)
@@ -41,6 +36,10 @@ namespace MapGen
                 case '#':
                     sprite = new Sprite(Data.grassTexture);
                     this.type = TileType.wall;
+                    break;
+                case '0':
+                    sprite = new Sprite(Data.skyTexture);
+                    this.type = TileType.teleport;
                     break;
                 default:
                     sprite = new Sprite(Data.skyTexture);

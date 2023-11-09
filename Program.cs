@@ -4,13 +4,14 @@ class Program
 {
     static void Main(string[] args)
     {
-        MainWindow mainWindow = new WindowEngine.MainWindow();
+        MainWindow mainWindow = new MainWindow();
 
-        while (WindowEngine.MainWindow.window.IsOpen)
+        while (MainWindow.window.IsOpen)
         {
             mainWindow.Update();
 
             mainWindow.Draw();
+
             MainWindow.window.Display();
         }
 

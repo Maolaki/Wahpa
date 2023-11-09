@@ -55,7 +55,7 @@ namespace EntityEngine
             {
                 for (coordX = coordinateX; coordX <= coordinateX + sizeX; coordX += Data.tileSize)
                 {
-                    MapGen.Tile checkedTile = MapGen.MapGenerator.mainLayer[(int)Math.Floor(coordX / (double)Data.tileSize), (int)Math.Floor(coordY / (double)Data.tileSize)];
+                    MapGen.Tile checkedTile = MainWindow.viewHandler.tileViewMap[(int)Math.Floor(coordX / (double)Data.tileSize), (int)Math.Floor(coordY / (double)Data.tileSize)];
                     if (checkedTile.type == MapGen.TileType.wall)
                         return moveableLength;
                 }
@@ -75,7 +75,7 @@ namespace EntityEngine
             {
                 for (coordX = coordinateX; coordX <= coordinateX + sizeX; coordX += Data.tileSize)
                 {
-                    MapGen.Tile checkedTile = MapGen.MapGenerator.mainLayer[(int)Math.Floor(coordX / (double)Data.tileSize), (int)Math.Floor(coordY / (double)Data.tileSize)];
+                    MapGen.Tile checkedTile = MainWindow.viewHandler.tileViewMap[(int)Math.Floor(coordX / (double)Data.tileSize), (int)Math.Floor(coordY / (double)Data.tileSize)];
                     if (checkedTile.type == MapGen.TileType.wall || checkedTile.type == MapGen.TileType.platform)
                         return moveableLength;
                 }
@@ -95,7 +95,7 @@ namespace EntityEngine
             {
                 for (coordY = coordinateY; coordY < coordinateY + sizeY; coordY += Data.tileSize)
                 {
-                    MapGen.Tile checkedTile = MapGen.MapGenerator.mainLayer[(int)Math.Ceiling(coordX / (double)Data.tileSize), (int)Math.Ceiling(coordY / (double)Data.tileSize)];
+                    MapGen.Tile checkedTile = MainWindow.viewHandler.tileViewMap[(int)Math.Ceiling(coordX / (double)Data.tileSize), (int)Math.Ceiling(coordY / (double)Data.tileSize)];
                     if (checkedTile.type == MapGen.TileType.wall)
                         return moveableLength;
                 }
@@ -115,7 +115,7 @@ namespace EntityEngine
             {
                 for (coordY = coordinateY; coordY < coordinateY + sizeY; coordY += Data.tileSize)
                 {
-                    MapGen.Tile checkedTile = MapGen.MapGenerator.mainLayer[(int)Math.Ceiling(coordX / (double)Data.tileSize), (int)Math.Ceiling(coordY / (double)Data.tileSize)];
+                    MapGen.Tile checkedTile = MainWindow.viewHandler.tileViewMap[(int)Math.Ceiling(coordX / (double)Data.tileSize), (int)Math.Ceiling(coordY / (double)Data.tileSize)];
                     if (checkedTile.type == MapGen.TileType.wall)
                         return moveableLength;
                 }

@@ -6,6 +6,8 @@ public static class Data
     public const float GRAVITATION_STRENGTH = 0.2f;
     public const float JUMP_STRENGTH = 6f;
 
+    public const int ROOM_WALL_SIZE = 3;
+
     public const int LEVEL1_SIZEX = 100;
     public const int LEVEL1_SIZEY = 100;
     public const int LEVEL1_CHUNK_SIZE = 11;

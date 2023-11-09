@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TestFPAv1.MapGeneratorFolder
+namespace MapGen
 {
-    internal class RoomViewHandler
+    
+
+    internal class Room
     {
     }
 }

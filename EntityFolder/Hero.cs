@@ -35,7 +35,7 @@ namespace EntityEngine
             if (Keyboard.IsKeyPressed(Keyboard.Key.N))
             {
                 Level1Generator.GenerateChunks();
-                MapGenerator.UpdateMap();
+                MapEngine.UpdateMap();
             }
 
             if (IsJumpKeyPressed() && (status == Status.stand || status == Status.run))

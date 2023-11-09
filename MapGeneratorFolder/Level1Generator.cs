@@ -6,38 +6,35 @@ namespace MapGen
     {
         public static void Generate()
         {
-            MapGenerator.chunkMap = new Chunk[Data.LEVEL1_SIZEX, Data.LEVEL1_SIZEY];
+            MapEngine.chunkMap = new Chunk[Data.LEVEL1_SIZEX, Data.LEVEL1_SIZEY];
 
             for (int i = 0; i < Data.LEVEL1_SIZEX; i++)
             {
                 for (int j = 0; j < Data.LEVEL1_SIZEY; j++)
                 {
-                    MapGenerator.chunkMap[i, j] = new Chunk();
-                    MapGenerator.chunkMap[i, j].x = i;
-                    MapGenerator.chunkMap[i, j].y = j;
+                    MapEngine.chunkMap[i, j] = new Chunk();
+                    MapEngine.chunkMap[i, j].x = i;
+                    MapEngine.chunkMap[i, j].y = j;
                 }
             }
 
             /////////////////////////////////////////////////////////
 
-            BasicGenerationMethods.BuildRoom(24,24,RoomSize.one_one);
-            //BasicGenerationMethods.BuildRoom(0, 0, RoomSize.one_one);
+            BasicGenerationMethods.BuildRoom(24,24,RoomSize.three_two);
 
             //Chunk spawn = MapGenerator.chunkMap[14, 14];
 
-            //spawn.chunkPixelArray = BasicGenerationMethods.ReadMapPattern(Data.LEVEL1_ONE_ONE);
-
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 3; i++)
                 GenerateChunks();
         }
 
         public static void GenerateChunks()
         {
-            List<Chunk> rightChanksUpdateCopy = new List<Chunk>(MapGenerator.rightChanksUpdate);
+            List<Chunk> rightChanksUpdateCopy = new List<Chunk>(MapEngine.rightChanksUpdate);
 
             foreach (Chunk chunk in rightChanksUpdateCopy)
             {
-                if (MapGenerator.chunkMap[chunk.x + 1, chunk.y].type == ChunkType.main)
+                if (MapEngine.chunkMap[chunk.x + 1, chunk.y].type == ChunkType.main)
                 {
                     BasicGenerationMethods.CreateExit(chunk, 1);
                 }
@@ -47,15 +44,15 @@ namespace MapGen
                 }
                 else
                 {
-                    MapGenerator.rightChanksUpdate.Remove(chunk);
+                    MapEngine.rightChanksUpdate.Remove(chunk);
                 }
             }
 
-            List<Chunk> leftChanksUpdateCopy = new List<Chunk>(MapGenerator.leftChanksUpdate);
+            List<Chunk> leftChanksUpdateCopy = new List<Chunk>(MapEngine.leftChanksUpdate);
 
             foreach (Chunk chunk in leftChanksUpdateCopy)
             {
-                if (MapGenerator.chunkMap[chunk.x - 1, chunk.y].type == ChunkType.main)
+                if (MapEngine.chunkMap[chunk.x - 1, chunk.y].type == ChunkType.main)
                 {
                     BasicGenerationMethods.CreateExit(chunk, 3);
                 }
@@ -65,15 +62,15 @@ namespace MapGen
                 }
                 else
                 {
-                    MapGenerator.leftChanksUpdate.Remove(chunk);
+                    MapEngine.leftChanksUpdate.Remove(chunk);
                 }
             }
 
-            List<Chunk> upChanksUpdateCopy = new List<Chunk>(MapGenerator.upChanksUpdate);
+            List<Chunk> upChanksUpdateCopy = new List<Chunk>(MapEngine.upChanksUpdate);
 
             foreach (Chunk chunk in upChanksUpdateCopy)
             {
-                if (MapGenerator.chunkMap[chunk.x, chunk.y - 1].type == ChunkType.main)
+                if (MapEngine.chunkMap[chunk.x, chunk.y - 1].type == ChunkType.main)
                 {
                     BasicGenerationMethods.CreateExit(chunk, 2);
                 }
@@ -83,15 +80,15 @@ namespace MapGen
                 }
                 else
                 {
-                    MapGenerator.upChanksUpdate.Remove(chunk);
+                    MapEngine.upChanksUpdate.Remove(chunk);
                 }
             }
 
-            List<Chunk> downChanksUpdateCopy = new List<Chunk>(MapGenerator.downChanksUpdate);
+            List<Chunk> downChanksUpdateCopy = new List<Chunk>(MapEngine.downChanksUpdate);
 
             foreach (Chunk chunk in downChanksUpdateCopy)
             {
-                if (MapGenerator.chunkMap[chunk.x, chunk.y + 1].type == ChunkType.main)
+                if (MapEngine.chunkMap[chunk.x, chunk.y + 1].type == ChunkType.main)
                 {
                     BasicGenerationMethods.CreateExit(chunk, 4);
                 }
@@ -101,7 +98,7 @@ namespace MapGen
                 }
                 else
                 {
-                    MapGenerator.downChanksUpdate.Remove(chunk);
+                    MapEngine.downChanksUpdate.Remove(chunk);
                 }
             }
         }
