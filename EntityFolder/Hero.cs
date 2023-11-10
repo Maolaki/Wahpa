@@ -5,7 +5,7 @@ using SFML.Window;
 
 namespace EntityEngine
 {
-    public class Hero : EntityPhysics
+    internal class Hero : HeroPhysics
     {
         public int speed { get; set; }
 
@@ -32,12 +32,6 @@ namespace EntityEngine
 
         public void Move()
         {
-            if (Keyboard.IsKeyPressed(Keyboard.Key.N))
-            {
-                Level1Generator.GenerateChunks();
-                MapEngine.UpdateMap();
-            }
-
             if (IsJumpKeyPressed() && (status == Status.stand || status == Status.run))
             {
                 this.jumpSpeed = Data.JUMP_STRENGTH;
