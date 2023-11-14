@@ -1,16 +1,11 @@
 ﻿using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WindowEngine;
 
 namespace EntityEngine
 {
-    internal class HeroPhysics : EntityPhysics
+    internal abstract class HeroPhysics : EntityPhysics
     {
         public enum Status
         {

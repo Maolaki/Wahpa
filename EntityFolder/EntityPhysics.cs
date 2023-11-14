@@ -5,7 +5,7 @@ using WindowEngine;
 
 namespace EntityEngine
 {
-    public class EntityPhysics
+    internal abstract class EntityPhysics : AttackableEntityTemplate
     {
         public int coordinateX { get; set; }
         public int coordinateY { get; set; }
@@ -13,20 +13,20 @@ namespace EntityEngine
         public int sizeY { get; private set; }
         public Sprite sprite { get; protected set; }
 
-
-        protected EntityPhysics(int coordinateX, int coordinateY, int sizeX, int sizeY, int mass, Texture texture)
+        protected EntityPhysics(int coordinateX, int coordinateY, int sizeX, int sizeY, Texture texture, float health) : base(true, health)
         {
             this.sizeX = sizeX;
             this.sizeY = sizeY;
-            sprite = new Sprite(texture);
-            sprite.Origin = new Vector2f(0,0);
-            sprite.Position = new Vector2f(coordinateX, coordinateY);
-            coordinateX = (int)sprite.Position.X;
-            coordinateY = (int)sprite.Position.Y;
+            this.coordinateX = coordinateX;
+            this.coordinateY = coordinateY;
+            this.sprite = new Sprite(texture);
+            this.sprite.Origin = new Vector2f(0,0);
+            this.sprite.Position = new Vector2f(coordinateX, coordinateY);
         }
 
-        /////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////
 
+        //////////////////////////////////////////////////////////////
         protected int CheckMoveableUp(int length)
         {
             int coordX;
@@ -37,7 +37,7 @@ namespace EntityEngine
             {
                 for (coordX = coordinateX; coordX <= coordinateX + sizeX; coordX += Data.tileSize)
                 {
-                    MapGen.Tile checkedTile = MainWindow.viewHandler.tileViewMap[coordX / Data.tileSize, coordY / Data.tileSize];
+                    MapGen.Tile checkedTile = ViewHandler.tileViewMap[coordX / Data.tileSize, coordY / Data.tileSize];
                     if (checkedTile.type == MapGen.TileType.wall)
                         return moveableLength;
                 }
@@ -57,7 +57,7 @@ namespace EntityEngine
             {
                 for (coordX = coordinateX; coordX <= coordinateX + sizeX; coordX += Data.tileSize)
                 {
-                    MapGen.Tile checkedTile = MainWindow.viewHandler.tileViewMap[coordX / Data.tileSize, coordY / Data.tileSize];
+                    MapGen.Tile checkedTile = ViewHandler.tileViewMap[coordX / Data.tileSize, coordY / Data.tileSize];
                     if (checkedTile.type == MapGen.TileType.wall || checkedTile.type == MapGen.TileType.platform)
                         return moveableLength;
                 }
@@ -77,7 +77,7 @@ namespace EntityEngine
             {
                 for (coordY = coordinateY; coordY < coordinateY + sizeY; coordY += Data.tileSize)
                 {
-                    MapGen.Tile checkedTile = MainWindow.viewHandler.tileViewMap[(int)Math.Ceiling(coordX / (double)Data.tileSize), (int)Math.Ceiling(coordY / (double)Data.tileSize)];
+                    MapGen.Tile checkedTile = ViewHandler.tileViewMap[(int)Math.Ceiling(coordX / (double)Data.tileSize), (int)Math.Ceiling(coordY / (double)Data.tileSize)];
                     if (checkedTile.type == MapGen.TileType.wall)
                         return moveableLength;
                 }
@@ -97,7 +97,7 @@ namespace EntityEngine
             {
                 for (coordY = coordinateY; coordY < coordinateY + sizeY; coordY += Data.tileSize)
                 {
-                    MapGen.Tile checkedTile = MainWindow.viewHandler.tileViewMap[(int)Math.Ceiling(coordX / (double)Data.tileSize), (int)Math.Ceiling(coordY / (double)Data.tileSize)];
+                    MapGen.Tile checkedTile = ViewHandler.tileViewMap[(int)Math.Ceiling(coordX / (double)Data.tileSize), (int)Math.Ceiling(coordY / (double)Data.tileSize)];
                     if (checkedTile.type == MapGen.TileType.wall)
                         return moveableLength;
                 }

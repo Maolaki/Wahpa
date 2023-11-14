@@ -1,6 +1,4 @@
-﻿using MapGen;
-using SFML.Graphics;
-using SFML.System;
+﻿using SFML.System;
 using SFML.Window;
 
 namespace EntityEngine
@@ -14,6 +12,17 @@ namespace EntityEngine
             this.speed = 1;
 
         }
+
+        ///////////////////////////////////////////
+        // Механика навыков
+
+        public override void Attacked()
+        {
+            
+        }
+
+        ///////////////////////////////////////////
+        // Механика движения
 
         public bool IsJumpKeyPressed()
         {
@@ -62,7 +71,7 @@ namespace EntityEngine
 
         //////////////////////////////////////////////////////////
 
-        public void Update()
+        public override void Update()
         {
             Move();
             UpdatePhysics();

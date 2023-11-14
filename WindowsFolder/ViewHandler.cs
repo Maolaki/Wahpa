@@ -5,23 +5,24 @@ using SFML.System;
 
 namespace WindowEngine
 {
-    internal class ViewHandler
+    internal static class ViewHandler
     {
-        private Chunk[,] chunkViewMap { get; set; }
-        public Tile[,] tileViewMap { get; private set; }
+        private static Chunk[,]? chunkViewMap { get; set; }
+        public static Tile[,]? tileViewMap { get; private set; }
+        private static Sprite background { get; set; }
 
-        private int startX { get; set; }
-        private int startY { get; set; }
-        private int sizeX { get; set; }
-        private int sizeY { get; set; }
-        public View view { get; private set; }
-        private Hero hero { get; set; }
+        private static int startX { get; set; }
+        private static int startY { get; set; }
+        private static int sizeX { get; set; }
+        private static int sizeY { get; set; }
+        public static View? view { get; private set; }
+        private static Hero? hero { get; set; }
 
         //////////////////////////////////////////////////////////////////////
 
-        public void Draw()
+        public static void Draw()
         {
-            for (int x = 0; x < tileViewMap.GetLength(0); x++)
+            for (int x = 0; x < tileViewMap?.GetLength(0); x++)
             {
                 for (int y = 0; y < tileViewMap.GetLength(1); y++)
                 {
@@ -31,38 +32,38 @@ namespace WindowEngine
                 }
             }
 
-            MainWindow.window.Draw(hero.sprite);
+            MainWindow.window.Draw(hero?.sprite);
         }
 
-        public void Update()
+        public static void Update()
         {
-            hero.Update();
+            hero?.Update();
             MainWindow.window.SetView(new View(hero.sprite.Position, new Vector2f(1 * (MainWindow.window.Size.X / 192), 1 * (MainWindow.window.Size.Y / 108))));
         }
 
         //////////////////////////////////////////////////////////////////////////
 
-        public void ChangeRoom()
+        public static void ChangeRoom()
         {
-            if (hero.coordinateX < 0)
+            if (hero?.coordinateX < 0)
             {
                 // переход влево
                 int chunkCoordinateY = hero.coordinateY / (Data.LEVEL1_CHUNK_SIZE * Data.tileSize);
                 UpdateChunkViewMap(startX - 1, startY + chunkCoordinateY, 128);
             }
-            else if (hero.coordinateX > chunkViewMap.GetLength(0) * 11)
+            else if (hero?.coordinateX > chunkViewMap?.GetLength(0) * 11)
             {
                 // переход вправо
                 int chunkCoordinateY = hero.coordinateY / (Data.LEVEL1_CHUNK_SIZE * Data.tileSize);
                 UpdateChunkViewMap(startX + 1, startY + chunkCoordinateY, -128);
             }
-            else if (hero.coordinateY < 0)
+            else if (hero?.coordinateY < 0)
             {
                 // переход вверх
                 int chunkCoordinateX = hero.coordinateX / (Data.LEVEL1_CHUNK_SIZE * Data.tileSize);
                 UpdateChunkViewMap(startX, startY - 1, 0, 32);
             }
-            else if (hero.coordinateY > chunkViewMap.GetLength(1) * 11)
+            else if (hero?.coordinateY > chunkViewMap?.GetLength(1) * 11)
             {
                 // переход вниз
                 int chunkCoordinateX = hero.coordinateX / (Data.LEVEL1_CHUNK_SIZE * Data.tileSize);
@@ -73,31 +74,39 @@ namespace WindowEngine
         }
 
         //////////////////////////////////////////////////////////////////////
-        private void UpdateTileViewMap()
+        private static void UpdateTileViewMap()
         {
             tileViewMap = new Tile[chunkViewMap.GetLength(0) * 11 + 6, chunkViewMap.GetLength(1) * 11 + 6];
 
-            for (int x = 0; x < chunkViewMap.GetLength(0); x++)
+            for (int i = 0; i < chunkViewMap.GetLength(0); i++)
             {
-                for (int y = 0; y < chunkViewMap.GetLength(1); y++)
+                for (int j = 0; j < chunkViewMap.GetLength(1); j++)
                 {
-                    if (chunkViewMap[x / 11, y / 11].type != ChunkType.empty && chunkViewMap[x / 11, y / 11].chunkPixelArray[x % 11, y % 11] != ' ')
+                    char[,] charTileArray = chunkViewMap[i, j].charTileArray;
+
+                    for (int i1 = 0; i1 < charTileArray.GetLength(0); i1++)
                     {
-                        tileViewMap[x + 3, y + 3] = new Tile();
-                        tileViewMap[x + 3, y + 3].SetTile(chunkViewMap[x / 11, y / 11].chunkPixelArray[x % 11, y % 11]);
-                        tileViewMap[x + 3, y + 3].sprite.Position = new Vector2f(x * Data.tileSize, y * Data.tileSize);
+                        for (int j1 = 0; j1 < charTileArray.GetLength(1); j1++)
+                        {
+                            if (charTileArray[i1, j1] != ' ')
+                            {
+                                tileViewMap[i * 11 + i1, j * 11 + j1] = new Tile(i, j, chunkViewMap[i, j], Data.LEVEL1_WALL_TEXTURES);
+                                tileViewMap[i * 11 + i1, j * 11 + j1].sprite.Position = new Vector2f(i * Data.tileSize, j * Data.tileSize);
+                            }
+                            else
+                            {
+                                tileViewMap[i * 11 + i1, j * 11 + j1] = new Tile();
+                            }
+                        }
                     }
-                    else
-                    {
-                        tileViewMap[x + 3, y + 3] = new Tile();
-                    }
+
                 }
             }
 
             UpdateTileViewMapBorder();
         }
 
-        private void UpdateTileViewMapBorder()
+        private static void UpdateTileViewMapBorder()
         {
             for (int j = 0; j < tileViewMap.GetLength(1); j++)
             {
@@ -105,14 +114,14 @@ namespace WindowEngine
                 {
                     for (int i = 0; i < 3; i++)
                     {
-                        tileViewMap[i, j].SetTile('#');
+                        tileViewMap[i, j].SetTile(TileType.wall, Path.Combine(Data.LEVEL1_WALL_TEXTURES, "tile1.png"));
                     }
                 }
                 else
                 {
                     for (int i = 0; i < 3; i++)
-                    {
-                        tileViewMap[i, j].SetTile('0');
+                    { 
+                        tileViewMap[i, j].SetTile(TileType.empty);
                     }
                 }
 
@@ -120,14 +129,14 @@ namespace WindowEngine
                 {
                     for (int i = 0; i < 3; i++)
                     {
-                        tileViewMap[tileViewMap.GetLength(0) - i, j].SetTile('#');
+                        tileViewMap[tileViewMap.GetLength(0) - i, j].SetTile(TileType.wall, Path.Combine(Data.LEVEL1_WALL_TEXTURES, "tile1.png"));
                     }
                 }
                 else
                 {
                     for (int i = 0; i < 3; i++)
                     {
-                        tileViewMap[tileViewMap.GetLength(0) - i, j].SetTile('0');
+                        tileViewMap[tileViewMap.GetLength(0) - i, j].SetTile(TileType.empty);
                     }
                 }
                 
@@ -139,14 +148,14 @@ namespace WindowEngine
                 {
                     for (int j = 0; j < 3; j++)
                     {
-                        tileViewMap[i, j].SetTile('#');
+                        tileViewMap[i, j].SetTile(TileType.wall, Path.Combine(Data.LEVEL1_WALL_TEXTURES, "tile1.png"));
                     }
                 }
                 else
                 {
                     for (int j = 0; j < 3; j++)
                     {
-                        tileViewMap[i, j].SetTile('0');
+                        tileViewMap[i, j].SetTile(TileType.empty);
                     }
                 }
 
@@ -154,20 +163,20 @@ namespace WindowEngine
                 {
                     for (int j = 0; j < 3; j++)
                     {
-                        tileViewMap[i, tileViewMap.GetLength(1) - j].SetTile('#');
+                        tileViewMap[i, tileViewMap.GetLength(1) - j].SetTile(TileType.wall, Path.Combine(Data.LEVEL1_WALL_TEXTURES, "tile1.png"));
                     }
                 }
                 else
                 {
                     for (int j = 0; j < 3; j++)
                     {
-                        tileViewMap[i, tileViewMap.GetLength(1) - j].SetTile('0');
+                        tileViewMap[i, tileViewMap.GetLength(1) - j].SetTile(TileType.empty);
                     }
                 }
             }
         }
 
-        private void UpdateChunkViewMap(int chunkX, int chunkY, int heroCoordinateXSpawnPosition, int heroCoordinateYSpawnPosition = 0)
+        private static void UpdateChunkViewMap(int chunkX, int chunkY, int heroCoordinateXSpawnPosition, int heroCoordinateYSpawnPosition = 0)
         {
             startX = chunkX;
             startY = chunkY;
@@ -190,14 +199,14 @@ namespace WindowEngine
             hero.coordinateY = (chunkY - startX) * 11 * 16 + 112 + heroCoordinateYSpawnPosition;
         }
 
-        private void SetStartXY()
+        private static void SetStartXY()
         {
-            while (MapEngine.chunkMap[startX, startY].BorderLeft == false)
+            while (MapEngine.chunkMap[startX, startY].borderLeft == false)
             {
                 startX--;
                 sizeX++;
             }
-            while (MapEngine.chunkMap[startX, startY].BorderUp == false)
+            while (MapEngine.chunkMap[startX, startY].borderUp == false)
             {
                 startY--;
                 sizeY++;

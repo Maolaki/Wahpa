@@ -24,6 +24,7 @@ namespace MapGen
         public static List<Chunk> upChanksUpdate { get; set; } = new List<Chunk>();
         public static List<Chunk> downChanksUpdate { get; set; } = new List<Chunk>();
         public static Chunk[,] chunkMap { get; set; }
+        public static Room spawnRoom { get; set; }
 
         public static void LoadMap(in string mapPath)
         {

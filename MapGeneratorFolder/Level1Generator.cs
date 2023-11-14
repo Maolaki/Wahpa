@@ -12,9 +12,7 @@ namespace MapGen
             {
                 for (int j = 0; j < Data.LEVEL1_SIZEY; j++)
                 {
-                    MapEngine.chunkMap[i, j] = new Chunk();
-                    MapEngine.chunkMap[i, j].x = i;
-                    MapEngine.chunkMap[i, j].y = j;
+                    MapEngine.chunkMap[i, j] = new Chunk(i, j);
                 }
             }
 
@@ -34,17 +32,9 @@ namespace MapGen
 
             foreach (Chunk chunk in rightChanksUpdateCopy)
             {
-                if (MapEngine.chunkMap[chunk.x + 1, chunk.y].type == ChunkType.main)
+                if (BasicGenerationMethods.BuildRoomRight(chunk.coordinateX + 1, chunk.coordinateY))
                 {
                     BasicGenerationMethods.CreateExit(chunk, 1);
-                }
-                else if (BasicGenerationMethods.BuildRoomRight(chunk.x + 1, chunk.y, true))
-                {
-                    BasicGenerationMethods.CreateExit(chunk, 1);
-                }
-                else
-                {
-                    MapEngine.rightChanksUpdate.Remove(chunk);
                 }
             }
 
@@ -52,17 +42,9 @@ namespace MapGen
 
             foreach (Chunk chunk in leftChanksUpdateCopy)
             {
-                if (MapEngine.chunkMap[chunk.x - 1, chunk.y].type == ChunkType.main)
+                if (BasicGenerationMethods.BuildRoomLeft(chunk.coordinateX - 1, chunk.coordinateY))
                 {
                     BasicGenerationMethods.CreateExit(chunk, 3);
-                }
-                else if (BasicGenerationMethods.BuildRoomLeft(chunk.x - 1, chunk.y, true))
-                {
-                    BasicGenerationMethods.CreateExit(chunk, 3);
-                }
-                else
-                {
-                    MapEngine.leftChanksUpdate.Remove(chunk);
                 }
             }
 
@@ -70,17 +52,9 @@ namespace MapGen
 
             foreach (Chunk chunk in upChanksUpdateCopy)
             {
-                if (MapEngine.chunkMap[chunk.x, chunk.y - 1].type == ChunkType.main)
+                if (BasicGenerationMethods.BuildRoomUp(chunk.coordinateX, chunk.coordinateY - 1))
                 {
                     BasicGenerationMethods.CreateExit(chunk, 2);
-                }
-                else if (BasicGenerationMethods.BuildRoomUp(chunk.x, chunk.y - 1, true))
-                {
-                    BasicGenerationMethods.CreateExit(chunk, 2);
-                }
-                else
-                {
-                    MapEngine.upChanksUpdate.Remove(chunk);
                 }
             }
 
@@ -88,17 +62,9 @@ namespace MapGen
 
             foreach (Chunk chunk in downChanksUpdateCopy)
             {
-                if (MapEngine.chunkMap[chunk.x, chunk.y + 1].type == ChunkType.main)
+                if (BasicGenerationMethods.BuildRoomDown(chunk.coordinateX, chunk.coordinateY + 1))
                 {
                     BasicGenerationMethods.CreateExit(chunk, 4);
-                }
-                else if (BasicGenerationMethods.BuildRoomDown(chunk.x, chunk.y + 1, true))
-                {
-                    BasicGenerationMethods.CreateExit(chunk, 4);
-                }
-                else
-                {
-                    MapEngine.downChanksUpdate.Remove(chunk);
                 }
             }
         }

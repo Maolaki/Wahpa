@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace EntityEngine
 {
-    internal abstract class Triggerable
+    internal interface ITriggerable
     {
-        public abstract void Run();
+        public void Invoke();
 
     }
 }
