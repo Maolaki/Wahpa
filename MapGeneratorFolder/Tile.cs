@@ -13,18 +13,13 @@ namespace MapGen
 
     internal class Tile
     {
-        public Sprite sprite { get; private set; } = new Sprite();
+        public Sprite sprite { get; set; }
         public TileType type { get; set; }
 
-        public Tile()
+        public Tile(TileType type)
         {
-            this.type = TileType.empty;
-        }
-
-        public Tile(int coordX, int coordY, Chunk chunk, string textureFolder)
-        {
-            this.type = TileType.wall;
-            GetSprite(coordX, coordY, chunk, textureFolder);
+            this.type = type;
+            this.sprite = new Sprite();
         }
 
         public void SetTile(TileType type, string texturePath = null)
@@ -35,50 +30,57 @@ namespace MapGen
             this.type = type;
         }
 
-        public Sprite GetSprite(int coordX, int coordY, Chunk chunk, string textureFolder)
+        public static void LoadBordersAndCorners(Tile[,] tileArray, string textureFolder)
         {
-            Sprite sprite = new Sprite();
-
-            switch (coordY % 3)
+            for (int coordX = 0; coordX < tileArray.GetLength(0); coordX++)
             {
-                case 0:
-                    sprite = new Sprite(new Texture(Path.Combine(textureFolder, "tile1.png")));
-                    break;
-                case 1:
-                    sprite = new Sprite(new Texture(Path.Combine(textureFolder, "tile2.png")));
-                    break;
-                case 2:
-                    sprite = new Sprite(new Texture(Path.Combine(textureFolder, "tile3.png")));
-                    break;
+                for (int coordY = 0; coordY < tileArray.GetLength(1); coordY++)
+                {
+                    if (tileArray[coordX, coordY].type != TileType.wall)
+                        continue;
+
+                    Sprite sprite = tileArray[coordX, coordY].sprite;
+
+                    switch (coordX % 3)
+                    {
+                        case 0:
+                            sprite.Texture = new Texture(Path.Combine(textureFolder, "tile1.png"));
+                            break;
+                        case 1:
+                            sprite.Texture = new Texture(Path.Combine(textureFolder, "tile2.png"));
+                            break;
+                        case 2:
+                            sprite.Texture = new Texture(Path.Combine(textureFolder, "tile3.png"));
+                            break;
+                    }
+
+                    if (coordY > 0 && tileArray[coordX, coordY - 1].type != TileType.wall)
+                        sprite.Texture.Update(new Texture(Path.Combine(textureFolder, "border1.png")), 0, 0);
+
+                    if (coordX < tileArray.GetLength(0) -1 && tileArray[coordX + 1, coordY].type != TileType.wall)
+                        sprite.Texture.Update(new Texture(Path.Combine(textureFolder, "border2.png")), 12, 0);
+
+                    if (coordY < tileArray.GetLength(1) - 1 && tileArray[coordX, coordY + 1].type != TileType.wall)
+                        sprite.Texture.Update(new Texture(Path.Combine(textureFolder, "border3.png")), 0, 12);
+
+                    if (coordX > 0 && tileArray[coordX - 1, coordY].type != TileType.wall)
+                        sprite.Texture.Update(new Texture(Path.Combine(textureFolder, "border4.png")), 0, 0);
+
+
+
+                    if (coordX > 0 && coordY > 0 && tileArray[coordX - 1, coordY - 1].type != TileType.wall)
+                        sprite.Texture.Update(new Texture(Path.Combine(textureFolder, "corner1.png")), 0, 0);
+
+                    if (coordX < tileArray.GetLength(0) - 1 && coordY > 0 && tileArray[coordX + 1, coordY - 1].type != TileType.wall)
+                        sprite.Texture.Update(new Texture(Path.Combine(textureFolder, "corner2.png")), 12, 0);
+
+                    if (coordX < tileArray.GetLength(0) - 1 && coordY < tileArray.GetLength(1) - 1 && tileArray[coordX + 1, coordY + 1].type != TileType.wall)
+                        sprite.Texture.Update(new Texture(Path.Combine(textureFolder, "corner3.png")), 12, 12);
+
+                    if (coordX > 0 && coordY < tileArray.GetLength(1) - 1 && tileArray[coordX - 1, coordY + 1].type != TileType.wall)
+                        sprite.Texture.Update(new Texture(Path.Combine(textureFolder, "corner4.png")), 0, 12);
+                }
             }
-
-            if (chunk.charTileArray[coordX, coordY - 1] == '#')
-                sprite.Texture.Update(new Texture(Path.Combine(textureFolder, "border1.png")), 0, 0);
-
-            if (chunk.charTileArray[coordX + 1, coordY] == '#')
-                sprite.Texture.Update(new Texture(Path.Combine(textureFolder, "border2.png")), 12, 0);
-
-            if (chunk.charTileArray[coordX, coordY - 1] == '#')
-                sprite.Texture.Update(new Texture(Path.Combine(textureFolder, "border3.png")), 0, 11);
-
-            if (chunk.charTileArray[coordX - 1, coordY] == '#')
-                sprite.Texture.Update(new Texture(Path.Combine(textureFolder, "border4.png")), 0, 0);
-
-
-
-            if (chunk.charTileArray[coordX - 1, coordY - 1] == '#')
-                sprite.Texture.Update(new Texture(Path.Combine(textureFolder, "corner1.png")), 0, 0);
-
-            if (chunk.charTileArray[coordX + 1, coordY - 1] == '#')
-                sprite.Texture.Update(new Texture(Path.Combine(textureFolder, "corner2.png")), 12, 0);
-
-            if (chunk.charTileArray[coordX + 1, coordY + 1] == '#')
-                sprite.Texture.Update(new Texture(Path.Combine(textureFolder, "corner3.png")), 12, 12);
-
-            if (chunk.charTileArray[coordX - 1, coordY + 1] == '#')
-                sprite.Texture.Update(new Texture(Path.Combine(textureFolder, "corner4.png")), 0, 12);
-
-            return sprite;
         }
     }
 }

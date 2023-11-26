@@ -19,8 +19,6 @@ namespace MapGen
         public int coordinateX { get; set; }
         public int coordinateY { get; set; }
 
-        public List<EntityTemplate> entityArray { get; set; } = new List<EntityTemplate> { };
-
         public Chunk(int coordX, int coordY)
         {
             // Квадратики для пустых чанков

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EntityEngine
 {
-    internal abstract class AttackableEntityTemplate
+    internal abstract class AttackableEntityTemplate : Triggerable
     {
         public bool killable { get; set; }
         public float health { get; set; }

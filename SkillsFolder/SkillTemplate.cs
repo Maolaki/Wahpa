@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SFML.Graphics;
 
 namespace EntityEngine
 {
-    internal abstract class SkillTemplate : ITriggerable
+    internal abstract class SkillTemplate : Triggerable
     {
-        protected Data.EntityAnimation boomAnimation;
-        protected Data.EntityAnimation skillAnimation;
+        protected List<Texture> boomAnimation;
+        protected List<Texture> skillAnimation;
         protected bool isPlayerSkill;
         protected bool isActive;
         protected int damage;

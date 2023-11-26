@@ -9,16 +9,15 @@ namespace MapGen
 {
     internal class Room
     {
-        public LinkedList<EntityTemplate> EntityList = new LinkedList<EntityTemplate> { };
+        public List<Triggerable> heroSkills { get; init; } = new List<Triggerable> { };
+        public List<Triggerable> monstersSkills { get; init; } = new List<Triggerable> { };
+        public List<Triggerable> monsters { get; init; } = new List<Triggerable> { };
+        public Hero hero { get; set; }
         public int sizeX;
         public int sizeY;
         public int startChunkX;
         public int startChunkY;
-
-        public Room()
-        {
-
-        }
         
+        //тут проверки остальные
     }
 }

@@ -9,8 +9,8 @@ namespace WindowEngine
     {
         public static RenderWindow window = new RenderWindow(new VideoMode(800, 600), "MainWidow");
         public static Clock clock = new Clock();
-        private static Time pDeltaTime;
-        public static float deltaTime;
+        public static Time pDeltaTime { get; private set; }
+        public static float deltaTime { get; private set; }
 
         public MainWindow()
         {
@@ -19,6 +19,8 @@ namespace WindowEngine
             window.Closed += _Closed;
 
             window.Resized += _Resized;
+
+            Start();
         }
 
         private void _Resized(object? sender, SizeEventArgs e)
@@ -33,7 +35,7 @@ namespace WindowEngine
 
         public void Start()
         {
-
+            ViewHandler.TestStart();
         }
 
         public void Update()

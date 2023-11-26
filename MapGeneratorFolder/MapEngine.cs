@@ -25,6 +25,8 @@ namespace MapGen
         public static List<Chunk> downChanksUpdate { get; set; } = new List<Chunk>();
         public static Chunk[,] chunkMap { get; set; }
         public static Room spawnRoom { get; set; }
+        public static int heroCoordinateXSpawnPosition { get; set; }
+        public static int heroCoordinateYSpawnPosition { get; set; }
 
         public static void LoadMap(in string mapPath)
         {
@@ -34,17 +36,17 @@ namespace MapGen
             {
                 for (int j = 0; j < mapArray.GetLength(1); j++)
                 {
-                    char[,] chunkPixelArray = new char[11, 11];
+                    char[,] charChunkArray = new char[11, 11];
 
                     for (int k = 0; k < 11; k++)
                     {
                         for (int l = 0; l < 11; l++)
                         {
-                            chunkPixelArray[k, l] = mapArray[i * 11 + k, j * 11 + l];
+                            charChunkArray[k, l] = mapArray[i * 11 + k, j * 11 + l];
                         }
                     }
 
-                    chunkMap[i, j].chunkPixelArray = chunkPixelArray;
+                    chunkMap[i, j].charTileArray = charChunkArray;
                 }
             }
         }

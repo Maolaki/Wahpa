@@ -1,13 +1,17 @@
-﻿namespace EntityEngine
-{
-    internal class ExitEntity : EntityTemplate
-    {
-        ExitEntity() : base(false, 0f)
-        { }
+﻿using SFML.System;
 
-        public override void Invoke()
+namespace EntityEngine
+{
+    internal class ExitEntity : Triggerable
+    {
+        public ExitEntity(int coordinateX, int coordinateY, int sizeX, int sizeY)
         {
-            WindowEngine.ViewHandler.ChangeRoom();
+            this.coordinateX = coordinateX;
+            this.coordinateY = coordinateY;
+            this.triggerZoneSizeX = sizeX;
+            this.triggerZoneSizeY = sizeY;
+            this.sprite.Origin = new Vector2f(0, 0);
+            this.sprite.Position = new Vector2f(coordinateX, coordinateY);
         }
     }
 }

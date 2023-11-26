@@ -22,36 +22,30 @@ public static class Data
 
     public static readonly String LEVEL1_WALL_TEXTURES = "..\\..\\..\\Texture\\WoodPlanks";
 
-    public static readonly Texture grassTexture = new Texture("..\\..\\..\\Texture\\grass.png");
-    public static readonly Texture woodplankTexture = new Texture("..\\..\\..\\Texture\\woodplank.png");
-    public static readonly Texture skyTexture = new Texture("..\\..\\..\\Texture\\sky.png");
 
-    public static readonly Texture heroStandingTexture = new Texture("..\\..\\..\\Texture\\heroStanding.png");
-    public static readonly Texture heroJumpingTexture = new Texture("..\\..\\..\\Texture\\heroJumping.png");
-    public static readonly Texture heroRunning1Texture = new Texture("..\\..\\..\\Texture\\heroRunning1.png");
-
-    public struct EntityAnimation
+    public static Dictionary<string, List<Texture>> EntityDictionary = new Dictionary<string, List<Texture>>
     {
-        string anim1;
-        string anim2;
-        string anim3;
-        string anim4;
+        {"HeroBloodShamanStand",
+        new List<Texture>(new Texture[] {
+            new Texture("..\\..\\..\\Texture\\HeroBloodShaman\\heroStand1.png"),
+            new Texture("..\\..\\..\\Texture\\HeroBloodShaman\\heroStand1.png"),
+            new Texture("..\\..\\..\\Texture\\HeroBloodShaman\\heroStand1.png"),
+            new Texture("..\\..\\..\\Texture\\HeroBloodShaman\\heroStand2.png"),
+            new Texture("..\\..\\..\\Texture\\HeroBloodShaman\\heroStand2.png"),
+            new Texture("..\\..\\..\\Texture\\HeroBloodShaman\\heroStand2.png")
+        }) },
+        {"HeroBloodShamanRun",
+            new List<Texture>(new Texture[] {
+            new Texture("..\\..\\..\\Texture\\HeroBloodShaman\\heroRun1.png"),
+            new Texture("..\\..\\..\\Texture\\HeroBloodShaman\\heroRun2.png"),
+            new Texture("..\\..\\..\\Texture\\HeroBloodShaman\\heroRun3.png"),
+            new Texture("..\\..\\..\\Texture\\HeroBloodShaman\\heroRun2.png")
+        }) },
+        {"HeroBloodShamanJump",
+            new List<Texture>(new Texture[] {
+            new Texture("..\\..\\..\\Texture\\HeroBloodShaman\\heroJump.png")
+        }) }
 
-        public EntityAnimation(string anim1, string anim2, string anim3, string anim4)
-        {
-            this.anim1 = anim1;
-            this.anim2 = anim2;
-            this.anim3 = anim3;
-            this.anim4 = anim4;
-        }
-    }
-
-    public static Dictionary<string, EntityAnimation> EntityDictionary = new Dictionary<string, EntityAnimation>
-    {
-        // придумать тут навыки всякие
-        {"BloodExposion", new("///", "///", "///", "///") },
-        {"BloodArrow", new("///", "///", "///", "///") },
-        {"BloodSpike", new("///", "///", "///", "///") }
     };
 
 }

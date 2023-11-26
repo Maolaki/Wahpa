@@ -18,9 +18,7 @@ namespace MapGen
 
             /////////////////////////////////////////////////////////
 
-            BasicGenerationMethods.BuildRoom(24,24,RoomSize.three_two);
-
-            //Chunk spawn = MapGenerator.chunkMap[14, 14];
+            BasicGenerationMethods.BuildRoom(24,24,RoomSize.five_five);
 
             for (int i = 0; i < 3; i++)
                 GenerateChunks();
@@ -29,6 +27,9 @@ namespace MapGen
         public static void GenerateChunks()
         {
             List<Chunk> rightChanksUpdateCopy = new List<Chunk>(MapEngine.rightChanksUpdate);
+            List<Chunk> leftChanksUpdateCopy = new List<Chunk>(MapEngine.leftChanksUpdate);
+            List<Chunk> upChanksUpdateCopy = new List<Chunk>(MapEngine.upChanksUpdate);
+            List<Chunk> downChanksUpdateCopy = new List<Chunk>(MapEngine.downChanksUpdate);
 
             foreach (Chunk chunk in rightChanksUpdateCopy)
             {
@@ -38,8 +39,6 @@ namespace MapGen
                 }
             }
 
-            List<Chunk> leftChanksUpdateCopy = new List<Chunk>(MapEngine.leftChanksUpdate);
-
             foreach (Chunk chunk in leftChanksUpdateCopy)
             {
                 if (BasicGenerationMethods.BuildRoomLeft(chunk.coordinateX - 1, chunk.coordinateY))
@@ -48,8 +47,6 @@ namespace MapGen
                 }
             }
 
-            List<Chunk> upChanksUpdateCopy = new List<Chunk>(MapEngine.upChanksUpdate);
-
             foreach (Chunk chunk in upChanksUpdateCopy)
             {
                 if (BasicGenerationMethods.BuildRoomUp(chunk.coordinateX, chunk.coordinateY - 1))
@@ -57,8 +54,6 @@ namespace MapGen
                     BasicGenerationMethods.CreateExit(chunk, 2);
                 }
             }
-
-            List<Chunk> downChanksUpdateCopy = new List<Chunk>(MapEngine.downChanksUpdate);
 
             foreach (Chunk chunk in downChanksUpdateCopy)
             {

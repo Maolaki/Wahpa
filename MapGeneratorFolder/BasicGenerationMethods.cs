@@ -1,4 +1,5 @@
-﻿using SFML.Graphics;
+﻿using EntityEngine;
+using SFML.Graphics;
 using System.Collections.Generic;
 
 namespace MapGen
@@ -140,9 +141,10 @@ namespace MapGen
                         secondChunk.charTileArray[0, i] = '0';
                         chunk.exitRight = true;
                         secondChunk.exitLeft = true;
-                        MapEngine.rightChanksUpdate.Remove(chunk);
-                        MapEngine.leftChanksUpdate.Remove(secondChunk);
                     }
+
+                    MapEngine.rightChanksUpdate.Remove(chunk);
+                    MapEngine.leftChanksUpdate.Remove(secondChunk);
                     break;
                 case 2:
                     secondChunk = MapEngine.chunkMap[chunk.coordinateX, chunk.coordinateY - 1];
@@ -154,9 +156,10 @@ namespace MapGen
                         secondChunk.charTileArray[i, 10] = '0';
                         chunk.exitUp = true;
                         secondChunk.exitDown = true;
-                        MapEngine.upChanksUpdate.Remove(chunk);
-                        MapEngine.downChanksUpdate.Remove(secondChunk);
                     }
+
+                    MapEngine.upChanksUpdate.Remove(chunk);
+                    MapEngine.downChanksUpdate.Remove(secondChunk);
                     break;
                 case 3:
                     secondChunk = MapEngine.chunkMap[chunk.coordinateX - 1, chunk.coordinateY];
@@ -168,9 +171,10 @@ namespace MapGen
                         secondChunk.charTileArray[10, i] = '0';
                         chunk.exitLeft = true;
                         secondChunk.exitRight = true;
-                        MapEngine.leftChanksUpdate.Remove(chunk);
-                        MapEngine.rightChanksUpdate.Remove(secondChunk);
                     }
+
+                    MapEngine.leftChanksUpdate.Remove(chunk);
+                    MapEngine.rightChanksUpdate.Remove(secondChunk);
                     break;
                 case 4:
                     secondChunk = MapEngine.chunkMap[chunk.coordinateX, chunk.coordinateY + 1];
@@ -182,9 +186,10 @@ namespace MapGen
                         secondChunk.charTileArray[i, 0] = '0';
                         chunk.exitDown = true;
                         secondChunk.exitUp = true;
-                        MapEngine.downChanksUpdate.Remove(chunk);
-                        MapEngine.upChanksUpdate.Remove(secondChunk);
                     }
+
+                    MapEngine.downChanksUpdate.Remove(chunk);
+                    MapEngine.upChanksUpdate.Remove(secondChunk);
                     break;
             }
 
@@ -203,7 +208,7 @@ namespace MapGen
                 if (MapEngine.chunkMap[startX + i, startY].room != null)
                 {
                     sizeX = i;
-                    break;
+                    return;
                 }
 
                 for (int j = 1; j <= sizeYUp; j++)
@@ -240,7 +245,7 @@ namespace MapGen
                 if (MapEngine.chunkMap[startX - i, startY].room != null)
                 {
                     sizeX = i;
-                    break;
+                    return;
                 }
 
                 for (int j = 1; j <= sizeYUp; j++)
@@ -277,7 +282,7 @@ namespace MapGen
                 if (MapEngine.chunkMap[startX, startY - j].room != null)
                 {
                     sizeY = j;
-                    break;
+                    return;
                 }
 
                 for (int i = 1; i <= sizeXRight; i++)
@@ -314,7 +319,7 @@ namespace MapGen
                 if (MapEngine.chunkMap[startX, startY + j].room != null)
                 {
                     sizeY = j;
-                    break;
+                    return;
                 }
 
                 for (int i = 1; i <= sizeXRight; i++)
@@ -346,7 +351,6 @@ namespace MapGen
 
         public static RoomSize ChooseRoomRightLeft(int startX, int startY, ref int sizeYUp, ref int sizeYDown, bool isRight)
         {
-            Random random = new Random();
             int sizeX = 0;
             int sizeY;
 
@@ -360,7 +364,7 @@ namespace MapGen
             var availableRoomSizes = roomSizesRightLeft.Where(rs => sizeX >= rs.Value.sizeX && sizeY >= rs.Value.sizeY).ToList();
 
             int totalChance = availableRoomSizes.Sum(rs => rs.Value.chance);
-            int randomChance = random.Next(totalChance);
+            int randomChance = Data.random.Next(totalChance);
 
             foreach (var roomSize in availableRoomSizes)
             {
@@ -415,21 +419,22 @@ namespace MapGen
             {
                 for (int j = 0; j < roomDimensions.sizeY; j++)
                 {
-                    char[,] chunkPixelArray = new char[11, 11];
+                    char[,] charChunkArray = new char[11, 11];
 
                     for (int k = 0; k < 11; k++)
                     {
                         for (int l = 0; l < 11; l++)
                         {
-                            chunkPixelArray[k, l] = patternArray[i * 11 + k, j * 11 + l];
+                            charChunkArray[k, l] = patternArray[i * 11 + k, j * 11 + l];
                         }
                     }
 
-                    MapEngine.chunkMap[startX + i, startY + j].charTileArray = chunkPixelArray;
+                    MapEngine.chunkMap[startX + i, startY + j].charTileArray = charChunkArray;
                 }
             }
 
             SetBorderAndRoom(roomDimensions, startX, startY);
+            MapEngine.spawnRoom = MapEngine.chunkMap[startX, startY].room;
         }
 
         public static bool BuildRoomRight(int startX, int startY)
@@ -441,7 +446,7 @@ namespace MapGen
 
             if (roomSize == RoomSize.empty)
             {
-                MapEngine.rightChanksUpdate.Remove(MapEngine.chunkMap[startX + 1,startY]);
+                MapEngine.rightChanksUpdate.Remove(MapEngine.chunkMap[startX - 1,startY]);
                 return false;
             }
 
@@ -449,11 +454,11 @@ namespace MapGen
             char[,] patternArray = ReadMapPattern(roomDimensions.chunkTemplatePath);
 
             List<int> possibleStartPoints = new List<int>();
-            for (int i = 0; i < roomDimensions.sizeY && i <= SizeYUp; i++)
+            for (int j = 0; j < roomDimensions.sizeY && j <= SizeYUp; j++)
             {
-                if (i + SizeYDown + 1 >= roomDimensions.sizeY)
+                if (j + SizeYDown + 1 >= roomDimensions.sizeY)
                 {
-                    possibleStartPoints.Add(startY - i);
+                    possibleStartPoints.Add(startY - j);
                 }
             }
 
@@ -490,7 +495,7 @@ namespace MapGen
 
             if (roomSize == RoomSize.empty)
             {
-                MapEngine.rightChanksUpdate.Remove(MapEngine.chunkMap[startX + 1, startY]);
+                MapEngine.leftChanksUpdate.Remove(MapEngine.chunkMap[startX + 1, startY]);
                 return false;
             }
 
@@ -498,11 +503,11 @@ namespace MapGen
             char[,] patternArray = ReadMapPattern(roomDimensions.chunkTemplatePath);
 
             List<int> possibleStartPoints = new List<int>();
-            for (int i = 0; i < roomDimensions.sizeY && i <= SizeYUp; i++)
+            for (int j = 0; j < roomDimensions.sizeY && j <= SizeYUp; j++)
             {
-                if (i + SizeYDown + 1 >= roomDimensions.sizeY)
+                if (j + SizeYDown + 1 >= roomDimensions.sizeY)
                 {
-                    possibleStartPoints.Add(startY - i);
+                    possibleStartPoints.Add(startY - j);
                 }
             }
 
@@ -539,7 +544,7 @@ namespace MapGen
 
             if (roomSize == RoomSize.empty)
             {
-                MapEngine.rightChanksUpdate.Remove(MapEngine.chunkMap[startX, startY]);
+                MapEngine.upChanksUpdate.Remove(MapEngine.chunkMap[startX, startY + 1]);
                 return false;
             }
 
@@ -588,7 +593,7 @@ namespace MapGen
 
             if (roomSize == RoomSize.empty)
             {
-                MapEngine.rightChanksUpdate.Remove(MapEngine.chunkMap[startX, startY]);
+                MapEngine.downChanksUpdate.Remove(MapEngine.chunkMap[startX, startY - 1]);
                 return false;
             }
 

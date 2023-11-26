@@ -7,9 +7,9 @@ namespace EntityEngine
     {
         public int speed { get; set; }
 
-        public Hero(int coordX, int coordY) : base(coordX, coordY, 32, 48, 2, Data.heroStandingTexture)
+        public Hero(int coordX, int coordY) : base(coordX, coordY, 16, 24, "HeroBloodShamanStand", 100)
         {
-            this.speed = 1;
+            this.speed = 2;
 
         }
 
@@ -26,46 +26,51 @@ namespace EntityEngine
 
         public bool IsJumpKeyPressed()
         {
-            return Keyboard.IsKeyPressed(Keyboard.Key.W) || Keyboard.IsKeyPressed(Keyboard.Key.Space);
+            return Keyboard.IsKeyPressed(Keyboard.Key.W) || Keyboard.IsKeyPressed(Keyboard.Key.Space) || Keyboard.IsKeyPressed(Keyboard.Key.Up);
         }
 
         public bool IsLeftKeyPressed()
         {
-            return Keyboard.IsKeyPressed(Keyboard.Key.A);
+            return Keyboard.IsKeyPressed(Keyboard.Key.A) || Keyboard.IsKeyPressed(Keyboard.Key.Left);
         }
 
         public bool IsRightKeyPressed()
         {
-            return Keyboard.IsKeyPressed(Keyboard.Key.D);
+            return Keyboard.IsKeyPressed(Keyboard.Key.D) || Keyboard.IsKeyPressed(Keyboard.Key.Right);
         }
 
         public void Move()
         {
-            if (IsJumpKeyPressed() && (status == Status.stand || status == Status.run))
+            prevMoveStatus = moveStatus;
+
+            if (IsJumpKeyPressed() && (moveStatus == Status.stand || moveStatus == Status.run))
             {
                 this.jumpSpeed = Data.JUMP_STRENGTH;
-                this.status = Status.jump;
+                this.moveStatus = Status.jump;
             }
 
             if (IsLeftKeyPressed())
             {
                 this.MoveLeft(this.speed);
                 this.direction = Direction.left;
-                if (status == Status.stand)
-                    status = Status.run;
+                if (moveStatus == Status.stand)
+                    moveStatus = Status.run;
             }
             else if (IsRightKeyPressed())
             {
                 this.MoveRight(this.speed);
                 this.direction = Direction.right;
-                if (status == Status.stand)
-                    status = Status.run;
+                if (moveStatus == Status.stand)
+                    moveStatus = Status.run;
             }
             else
             {
-                if (status == Status.run)
-                    status = Status.stand;
+                if (moveStatus == Status.run)
+                    moveStatus = Status.stand;
             }
+
+            if (moveStatus != prevMoveStatus)
+                UpdateSetAnimation();
 
         }
 
@@ -79,30 +84,19 @@ namespace EntityEngine
             //////////////////////////////////////////////
 
             //Анимации
-            if (status == Status.stand)
-            {
-                sprite.Texture = Data.heroStandingTexture;
-            } 
-            else if (status == Status.run)
-            {
-                sprite.Texture = Data.heroRunning1Texture;
-            } 
-            else if (status == Status.jump || status == Status.fall)
-            {
-                sprite.Texture = Data.heroJumpingTexture;
-            }
+            UpdateAnimation();
 
             //Направления
             if (direction == Direction.right && prevDirection == Direction.left)
             {
                 sprite.Scale = new Vector2f(1f, 1f);
-                sprite.Origin -= new Vector2f(32, 0);
+                sprite.Origin -= new Vector2f(16, 0);
                 prevDirection = Direction.right;
             } 
             else if (direction == Direction.left && prevDirection == Direction.right)
             {
                 sprite.Scale = new Vector2f(-1f, 1f);
-                sprite.Origin += new Vector2f(32, 0);
+                sprite.Origin += new Vector2f(16, 0);
                 prevDirection = Direction.left;
             }
 

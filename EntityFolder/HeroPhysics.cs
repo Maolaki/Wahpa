@@ -21,15 +21,34 @@ namespace EntityEngine
             left
         }
 
-        public Status status { get; protected set; }
+        public Status moveStatus { get; protected set; }
+        public Status prevMoveStatus { get; protected set; }
         public Direction direction { get; protected set; }
         public Direction prevDirection { get; protected set; }
 
-        protected HeroPhysics(int coordinateX, int coordinateY, int sizeX, int sizeY, int mass, Texture texture) 
-            : base(coordinateX, coordinateY, sizeX, sizeY, mass, texture)
+        protected HeroPhysics(int coordinateX, int coordinateY, int sizeX, int sizeY, string animName, float health) 
+            : base(coordinateX, coordinateY, sizeX, sizeY, animName, health)
         {
             direction = Direction.right;
             prevDirection = Direction.right;
+        }
+
+        /////////////////////////////////////////////////////////////////
+        
+        protected void UpdateSetAnimation()
+        {
+            if (moveStatus == Status.stand)
+            {
+                SetAnimation("HeroBloodShamanStand");
+            }
+            else if (moveStatus == Status.run)
+            {
+                SetAnimation("HeroBloodShamanRun");
+            }
+            else if (moveStatus == Status.jump || moveStatus == Status.fall)
+            {
+                SetAnimation("HeroBloodShamanJump");
+            }
         }
 
         /////////////////////////////////////////////////////////////////
@@ -56,7 +75,7 @@ namespace EntityEngine
 
             if (jumpSpeed <= 0)
             {
-                status = Status.fall;
+                moveStatus = Status.fall;
                 jumpHoldTime = 0f;
             }
         }
@@ -68,19 +87,18 @@ namespace EntityEngine
 
             if (CheckMoveableDown(1) == 0)
             {
-                status = Status.stand;
+                moveStatus = Status.stand;
                 fallSpeed = 0;
             }
         }
 
         protected void UpdatePhysics()
         {
-            if (status == Status.jump)
+            if (moveStatus == Status.jump)
                 Jump();
 
-            if (status == Status.fall || CheckMoveableDown(1) != 0 && (status == Status.stand || status == Status.run)) // Надо бы пофиксить
+            if (moveStatus == Status.fall || CheckMoveableDown(1) != 0 && (moveStatus == Status.stand || moveStatus == Status.run)) // Надо бы пофиксить
                 Fall();
-
 
             sprite.Position = new Vector2f(coordinateX, coordinateY);
         }
