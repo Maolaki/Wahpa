@@ -11,11 +11,15 @@ namespace WindowEngine
         public static Tile[,]? tileViewMap { get; private set; }
         private static Sprite background { get; set; }
         private static List<ExitEntity> exitArray { get; set; }
-        private static int startX { get; set; }
-        private static int startY { get; set; }
-        private static int sizeX { get; set; }
-        private static int sizeY { get; set; }
-        public static View? view { get; private set; }
+        private static int chunkStartX { get; set; }
+        private static int chunkStartY { get; set; }
+        private static int chunkSizeX { get; set; }
+        private static int chunkSizeY { get; set; }
+        private static int pixelSizeX { get; set; }
+        private static int pixelSizeY { get; set; }
+        private static View? view { get; set; }
+        public static int viewSizeX { get; set; } = 336;
+        public static int viewSizeY { get; set; } = 336;
         private static Hero? hero { get; set; }
 
         //////////////////////////////////////////////////////////////////////
@@ -35,23 +39,62 @@ namespace WindowEngine
             MainWindow.window.Draw(hero.sprite);
         }
 
-        public static void TestStart()
+        public static void Start()
         {
             hero = new Hero(324, 136);
             MapEngine.LoadLevel(1);
-            UpdateChunkViewMap(MapEngine.spawnRoom.startChunkX, MapEngine.spawnRoom.startChunkY, 324, 136);
+            UpdateChunkViewMap(MapEngine.spawnRoom.startChunkX, MapEngine.spawnRoom.startChunkY, 5);
             UpdateTileViewMap();
             Tile.LoadBordersAndCorners(tileViewMap, Data.LEVEL1_WALL_TEXTURES);
+
+            view = new View(hero.sprite.Position, new Vector2f(viewSizeX, viewSizeY));
         }
 
         public static void Update()
         {
             hero?.Update();
             CheckExitCollision();
-            MainWindow.window.SetView(new View(hero.sprite.Position, new Vector2f(60 * (MainWindow.window.Size.X / 192), 60 * (MainWindow.window.Size.Y / 108))));
+            UpdateViewSize();
         }
 
         //////////////////////////////////////////////////////////////////////////
+
+        public static void UpdateViewSize()
+        {
+            // Тут сделать установку размера экрана
+
+            float centerPositionX;
+            float centerPositionY;
+            // Установка границ области просмотра, чтобы она не выходила за пределы карты
+            if (viewSizeX / 2 > hero.sprite.Position.X)
+            {
+                centerPositionX = viewSizeX / 2;
+            }
+            else if (viewSizeX / 2 > pixelSizeX - hero.sprite.Position.X)
+            {
+                centerPositionX = pixelSizeX - viewSizeX / 2;
+            }
+            else 
+            {
+                centerPositionX = hero.sprite.Position.X;
+            }
+
+            if (viewSizeY / 2 > hero.sprite.Position.Y)
+            {
+                centerPositionY = viewSizeX / 2;
+            }
+            else if (viewSizeY / 2 > pixelSizeY - hero.sprite.Position.Y)
+            {
+                centerPositionY = pixelSizeY - viewSizeY / 2;
+            }
+            else 
+            {
+                centerPositionY = hero.sprite.Position.Y;
+            }
+
+            view.Center = new Vector2f(centerPositionX, centerPositionY);
+            MainWindow.window.SetView(view);
+        }
 
         public static void ChangeRoom()
         {
@@ -61,25 +104,25 @@ namespace WindowEngine
             {
                 // переход влево
                 int chunkCoordinateY = (hero.coordinateY - 5 * 16 + 1) / (Data.LEVEL1_CHUNK_SIZE * Data.tileSize);
-                UpdateChunkViewMap(startX - 1, startY + chunkCoordinateY, 0, 0);
+                UpdateChunkViewMap(chunkStartX - 1, chunkStartY + chunkCoordinateY, 3);
             }
             else if (hero?.coordinateX + hero.sizeX >= (tileViewMap.GetLength(0) - 5) * 16)
             {
                 // переход вправо
                 int chunkCoordinateY = (hero.coordinateY - 5 * 16 + 1) / (Data.LEVEL1_CHUNK_SIZE * Data.tileSize);
-                UpdateChunkViewMap(startX + chunkViewMap.GetLength(0), startY + chunkCoordinateY, 0, 0);
+                UpdateChunkViewMap(chunkStartX + chunkViewMap.GetLength(0), chunkStartY + chunkCoordinateY, 1);
             }
             else if (hero?.coordinateY <= 80)
             {
                 // переход вверх
                 int chunkCoordinateX = (hero.coordinateX - 5 * 16 + 1) / (Data.LEVEL1_CHUNK_SIZE * Data.tileSize);
-                UpdateChunkViewMap(startX + chunkCoordinateX, startY - 1, 0, 0);
+                UpdateChunkViewMap(chunkStartX + chunkCoordinateX, chunkStartY - 1, 2);
             }
             else if (hero?.coordinateY + hero.sizeY >= (tileViewMap.GetLength(1) - 5) * 16)
             {
                 // переход вниз
                 int chunkCoordinateX = (hero.coordinateX - 5 * 16 + 1) / (Data.LEVEL1_CHUNK_SIZE * Data.tileSize);
-                UpdateChunkViewMap(startX + chunkCoordinateX, startY + chunkViewMap.GetLength(1), 0, 0);
+                UpdateChunkViewMap(chunkStartX + chunkCoordinateX, chunkStartY + chunkViewMap.GetLength(1), 4);
             }
 
             UpdateTileViewMap();
@@ -95,6 +138,8 @@ namespace WindowEngine
                     tileViewMap[i, j].sprite = new Sprite();
                 }
             }
+
+            exitArray.Clear();
         }
 
         public static void CheckExitCollision()
@@ -104,6 +149,7 @@ namespace WindowEngine
                 if (Triggerable.CheckCollission(exit, hero))
                 {
                     ChangeRoom();
+                    return;
                 }
                     
             }
@@ -148,6 +194,7 @@ namespace WindowEngine
 
             for (int j = 0; j < tileViewMap.GetLength(1); j++)
             {
+                //левая грань
                 if (tileViewMap[5, j] == null || tileViewMap[5, j].type == TileType.wall)
                 {
                     for (int i = 0; i < 5; i++)
@@ -162,10 +209,13 @@ namespace WindowEngine
                     {
                         tileViewMap[i, j] = new Tile(TileType.empty);
                         tileViewMap[i, j].sprite.Position = new Vector2f(i * 16, j * 16);
+
+                        if (i == 0)
                         exitArray.Add(new ExitEntity(i * 16, j * 16, 16, 16));
                     }
                 }
 
+                // правая грань
                 if (tileViewMap[tileViewMap.GetLength(0) - 6, j] == null || tileViewMap[tileViewMap.GetLength(0) - 6, j].type == TileType.wall)
                 {
                     for (int i = 0; i < 5; i++)
@@ -180,7 +230,9 @@ namespace WindowEngine
                     {
                         tileViewMap[tileViewMap.GetLength(0) - 1 - i, j] = new Tile(TileType.empty);
                         tileViewMap[tileViewMap.GetLength(0) - 1 - i, j].sprite.Position = new Vector2f((tileViewMap.GetLength(0) - 1 - i) * 16, j * 16);
-                        exitArray.Add(new ExitEntity((tileViewMap.GetLength(0) - 1 - i) * 16, j * 16, 16, 16));
+
+                        if (i == 0)
+                            exitArray.Add(new ExitEntity((tileViewMap.GetLength(0) - 1 - i) * 16, j * 16, 16, 16));
                     }
                 }
                 
@@ -188,6 +240,7 @@ namespace WindowEngine
             
             for (int i = 5; i < tileViewMap.GetLength(0); i++)
             {
+                // верхняя грань
                 if (tileViewMap[i, 5] == null || tileViewMap[i, 5].type == TileType.wall)
                 {
                     for (int j = 0; j < 5; j++)
@@ -202,10 +255,13 @@ namespace WindowEngine
                     {
                         tileViewMap[i, j] = new Tile(TileType.empty);
                         tileViewMap[i, j].sprite.Position = new Vector2f(i * 16, j * 16);
-                        exitArray.Add(new ExitEntity(i * 16, j * 16, 16, 16));
+
+                        if (j == 0)
+                            exitArray.Add(new ExitEntity(i * 16, j * 16, 16, 16));
                     }
                 }
 
+                // нижняя грань
                 if (tileViewMap[i, tileViewMap.GetLength(1) - 6] == null || tileViewMap[i, tileViewMap.GetLength(1) - 6].type == TileType.wall)
                 {
                     for (int j = 0; j < 5; j++)
@@ -220,34 +276,59 @@ namespace WindowEngine
                     {
                         tileViewMap[i, tileViewMap.GetLength(1) - 1 - j] = new Tile(TileType.empty);
                         tileViewMap[i, tileViewMap.GetLength(1) - 1 - j].sprite.Position = new Vector2f(i * 16, (tileViewMap.GetLength(1) - 1 - j) * 16);
-                        exitArray.Add(new ExitEntity(i * 16, (tileViewMap.GetLength(1) - 1 - j) * 16, 16, 16));
+
+                        if (j == 0)
+                            exitArray.Add(new ExitEntity(i * 16, (tileViewMap.GetLength(1) - 1 - j) * 16, 16, 16));
                     }
                 }
             }
         }
 
-        private static void UpdateChunkViewMap(int chunkX, int chunkY, int heroCoordinateXSpawnPosition, int heroCoordinateYSpawnPosition) 
+        private static void UpdateChunkViewMap(int chunkX, int chunkY, int route) 
         {
             Room room = MapEngine.chunkMap[chunkX, chunkY].room;
-            startX = room.startChunkX;
-            startY = room.startChunkY;
-           
-            sizeX = room.sizeX;
-            sizeY = room.sizeY;
+            chunkStartX = room.startChunkX;
+            chunkStartY = room.startChunkY;
 
-            chunkViewMap = new Chunk[sizeX, sizeY];
-            for (int i = 0; i < sizeX; i++)
+            chunkSizeX = room.sizeX;
+            chunkSizeY = room.sizeY;
+            pixelSizeX = (chunkSizeX * 11 * 16) + (10 * 16);
+            pixelSizeY = (chunkSizeY * 11 * 16) + (10 * 16);
+
+            chunkViewMap = new Chunk[chunkSizeX, chunkSizeY];
+            for (int i = 0; i < chunkSizeX; i++)
             {
-                for (int j = 0; j < sizeY; j++)
+                for (int j = 0; j < chunkSizeY; j++)
                 {
-                    chunkViewMap[i, j] = MapEngine.chunkMap[startX + i, startY + j];
+                    chunkViewMap[i, j] = MapEngine.chunkMap[chunkStartX + i, chunkStartY + j];
                 }
             }
 
-            //hero.coordinateX = (chunkX - startX) * 11 * 16 + 5 * 16 + 50 + heroCoordinateXSpawnPosition;
-            //hero.coordinateY = (chunkY - startX) * 11 * 16 + 5 * 16 + 50 + heroCoordinateYSpawnPosition;
-            hero.coordinateX = 100;
-            hero.coordinateY = 100;
+            switch (route)
+            {
+                case 1: // вправо
+                    hero.coordinateY = (chunkY - chunkStartY) * 11 * 16 + (5 * 16) + (hero.coordinateY - 5 * 16) % (11 * 16);
+                    hero.coordinateX = 32;
+                    break;
+                case 2: // вверх
+                    hero.coordinateX = (chunkX - chunkStartX) * 11 * 16 + (5 * 16) + (hero.coordinateX - 5 * 16) % (11 * 16);
+                    hero.coordinateY = (chunkSizeY * 11 * 16) + (5 * 16) + 25;
+                    break;
+                case 3: // влево
+                    hero.coordinateY = (chunkY - chunkStartY) * 11 * 16 + (5 * 16) + (hero.coordinateY - 5 * 16) % (11 * 16);
+                    hero.coordinateX = (chunkSizeX * 11 * 16) + (5 * 16) + 33;
+                    break;
+                case 4: // вниз
+                    hero.coordinateX = (chunkX - chunkStartX) * 11 * 16 + (5 * 16) + (hero.coordinateX - 5 * 16) % (11 * 16);
+                    hero.coordinateY = 24;
+                    break;
+                case 5: // центр
+                    hero.coordinateY = (chunkSizeY / 2 * 11 * 16) + (5 * 16) - 8;
+                    hero.coordinateX = (chunkSizeX / 2 * 11 * 16) + (5 * 16) - 12;
+                    break;
+            }
+            
+            
         }
 
         

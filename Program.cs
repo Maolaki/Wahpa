@@ -6,6 +6,8 @@ class Program
     {
         MainWindow mainWindow = new MainWindow();
 
+        mainWindow.Start();
+
         while (MainWindow.window.IsOpen)
         {
             mainWindow.Update();

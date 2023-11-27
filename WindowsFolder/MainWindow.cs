@@ -19,8 +19,6 @@ namespace WindowEngine
             window.Closed += _Closed;
 
             window.Resized += _Resized;
-
-            Start();
         }
 
         private void _Resized(object? sender, SizeEventArgs e)
@@ -35,7 +33,7 @@ namespace WindowEngine
 
         public void Start()
         {
-            ViewHandler.TestStart();
+            ViewHandler.Start();
         }
 
         public void Update()

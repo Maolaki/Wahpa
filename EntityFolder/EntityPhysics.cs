@@ -101,7 +101,7 @@ namespace EntityEngine
 
             for (coordX = coordinateX - 1; coordX > coordinateX - length; coordX -= 1)
             {
-                for (coordY = coordinateY; coordY < coordinateY + sizeY; coordY += 4)
+                for (coordY = coordinateY; coordY < coordinateY + sizeY; coordY += 1)
                 {
                     MapGen.Tile checkedTile = ViewHandler.tileViewMap[coordX / Data.tileSize, coordY / Data.tileSize];
                     if (checkedTile.type == MapGen.TileType.wall)
@@ -121,7 +121,7 @@ namespace EntityEngine
 
             for (coordX = coordinateX + sizeX; coordX < coordinateX + sizeX + length; coordX += 1)
             {
-                for (coordY = coordinateY; coordY < coordinateY + sizeY; coordY += 4)
+                for (coordY = coordinateY; coordY < coordinateY + sizeY; coordY += 1)
                 {
                     MapGen.Tile checkedTile = ViewHandler.tileViewMap[coordX / Data.tileSize, coordY / Data.tileSize];
                     if (checkedTile.type == MapGen.TileType.wall)
