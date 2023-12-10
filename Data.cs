@@ -22,6 +22,38 @@ public static class Data
 
     public static readonly String LEVEL1_WALL_TEXTURES = "..\\..\\..\\Texture\\WoodPlanks";
 
+    public static readonly Font font1 = new Font("..\\..\\..\\Fonts\\MinecraftBold.otf");
+    public static readonly Font font2 = new Font("..\\..\\..\\Fonts\\MinecraftRegular.otf");
+    public static readonly Font font3 = new Font("..\\..\\..\\Fonts\\Mintsoda.ttf");
+
+    public static readonly Texture background1 = new Texture("..\\..\\..\\Backgrounds\\Menu.jpg");
+    public static readonly Texture background2 = new Texture("..\\..\\..\\Backgrounds\\Forest.jpg");
+    public static readonly Texture background3 = new Texture("..\\..\\..\\Backgrounds\\Wood.jpg");
+    public static readonly Texture background4 = new Texture("..\\..\\..\\Backgrounds\\House.jpg");
+
+    public static Dictionary<string, int[]> SizesDict = new Dictionary<string, int[]>
+    {
+        { "1280x1280", new int[] { 1920, 1080 } },
+        { "1024x768", new int[] { 1024, 768 } },
+        { "800x600", new int[] { 800, 600 } }
+    };
+
+    public static Dictionary<string, Texture> GUIDict = new Dictionary<string, Texture>
+    {
+        { "Pane1", new Texture("..\\..\\..\\Texture\\GUI\\Pane.png") },
+        { "Button1", new Texture("..\\..\\..\\Texture\\GUI\\Button.png") },
+        { "LogOut", new Texture("..\\..\\..\\Texture\\GUI\\LogOut.png") },
+        { "ArrowRight", new Texture("..\\..\\..\\Texture\\GUI\\ArrowRight.png") },
+        { "ArrowLeft", new Texture("..\\..\\..\\Texture\\GUI\\ArrowLeft.png") },
+        { "ComboBox", new Texture("..\\..\\..\\Texture\\GUI\\ComboBox.png") },
+        { "ComboBoxMid", new Texture("..\\..\\..\\Texture\\GUI\\ComboBoxMid.png") },
+        { "ComboBoxEdge", new Texture("..\\..\\..\\Texture\\GUI\\ComboBoxEdge.png") },
+        { "ComboBoxEdge2", new Texture("..\\..\\..\\Texture\\GUI\\ComboBoxEdge2.png") },
+        { "CheckBoxFalse", new Texture("..\\..\\..\\Texture\\GUI\\CheckBoxFalse.png") },
+        { "CheckBoxTrue", new Texture("..\\..\\..\\Texture\\GUI\\CheckBoxTrue.png") },
+        { "Couter", new Texture("..\\..\\..\\Texture\\GUI\\Couter.png") },
+        { "TextField", new Texture("..\\..\\..\\Texture\\GUI\\TextField.png") }
+    };
 
     public static Dictionary<string, List<Texture>> EntityDictionary = new Dictionary<string, List<Texture>>
     {

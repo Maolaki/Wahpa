@@ -99,7 +99,7 @@ namespace EntityEngine
             int coordY;
             int moveableLength = 0;
 
-            for (coordX = coordinateX - 1; coordX > coordinateX - length; coordX -= 1)
+            for (coordX = coordinateX - 1; coordX >= coordinateX - length; coordX -= 1)
             {
                 for (coordY = coordinateY; coordY < coordinateY + sizeY; coordY += 1)
                 {
@@ -119,7 +119,7 @@ namespace EntityEngine
             int coordY;
             int moveableLength = 0;
 
-            for (coordX = coordinateX + sizeX; coordX < coordinateX + sizeX + length; coordX += 1)
+            for (coordX = coordinateX + sizeX; coordX <= coordinateX + sizeX + length - 1; coordX += 1)
             {
                 for (coordY = coordinateY; coordY < coordinateY + sizeY; coordY += 1)
                 {

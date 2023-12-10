@@ -1,5 +1,6 @@
 ﻿using SFML.System;
 using SFML.Window;
+using WindowEngine;
 
 namespace EntityEngine
 {
@@ -37,6 +38,11 @@ namespace EntityEngine
         public bool IsRightKeyPressed()
         {
             return Keyboard.IsKeyPressed(Keyboard.Key.D) || Keyboard.IsKeyPressed(Keyboard.Key.Right);
+        }
+
+        public bool IsEscapeKeyPressed()
+        {
+            return Keyboard.IsKeyPressed(Keyboard.Key.Escape);
         }
 
         public void Move()
@@ -78,6 +84,11 @@ namespace EntityEngine
 
         public override void Update()
         {
+            if (IsEscapeKeyPressed())
+            {
+                MainWindow.window.Close();
+            }
+
             Move();
             UpdatePhysics();
 

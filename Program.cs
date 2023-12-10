@@ -1,23 +1,29 @@
-﻿using WindowEngine;
+﻿using SFML.Graphics;
+using SFML.Window;
+using WindowEngine;
 
 class Program
 {
     static void Main(string[] args)
     {
-        MainWindow mainWindow = new MainWindow();
+        MainWindow.Start();
 
-        mainWindow.Start();
+      //  MainWindow.window.SetActive(false);
 
         while (MainWindow.window.IsOpen)
         {
-            mainWindow.Update();
-
-            mainWindow.Draw();
-
-            MainWindow.window.Display();
+            MainWindow.Update();
+            Render(MainWindow.window);
         }
+    }
 
-        return;
+    static void Render(RenderWindow window)
+    {
+      //  window.SetActive(true);
+
+        MainWindow.Draw();
+
+        window.Display();
     }
 
 }
