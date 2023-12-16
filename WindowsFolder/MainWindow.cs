@@ -1,4 +1,5 @@
-﻿using SFML.Graphics;
+﻿using DatabaseEngine;
+using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
 
@@ -17,7 +18,6 @@ namespace WindowEngine
             window.SetView(new View(new FloatRect(0, 0, e.Width, e.Height)));
             ViewHandler.screenSizeX = e.Width;
             ViewHandler.screenSizeY = e.Height;
-            window.SetFramerateLimit(120);
 
             ViewHandler.UpdateGUIElements();
         }
@@ -31,13 +31,34 @@ namespace WindowEngine
         {
             settings.AntialiasingLevel = 8;
             window = new RenderWindow(new VideoMode(1920, 1080), "Wahpa", Styles.Fullscreen, settings);
-            window.SetVerticalSyncEnabled(true);
 
             window.Closed += _Closed;
 
             window.Resized += _Resized;
 
             ViewHandler.Start();
+
+            DataBase.DBtest();
+        }
+
+        public static void StartChanged()
+        {
+            settings.AntialiasingLevel = 8;
+            window = new RenderWindow(new VideoMode(1920, 1080), "Wahpa", Styles.Fullscreen, settings);
+
+            window.Closed += _Closed;
+
+            window.Resized += _Resized;
+        }
+
+        public static void StartChanged(uint sizeX, uint sizeY)
+        {
+            settings.AntialiasingLevel = 8;
+            window = new RenderWindow(new VideoMode(sizeX, sizeY), "Wahpa", Styles.None, settings);
+
+            window.Closed += _Closed;
+
+            window.Resized += _Resized;
         }
 
         public static void Update()

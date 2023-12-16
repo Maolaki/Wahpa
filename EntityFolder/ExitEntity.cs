@@ -13,5 +13,9 @@ namespace EntityEngine
             this.sprite.Origin = new Vector2f(0, 0);
             this.sprite.Position = new Vector2f(coordinateX, coordinateY);
         }
+
+        public override void Update()
+        {
+        }
     }
 }

@@ -6,20 +6,48 @@ namespace EntityEngine
 {
     internal class Hero : HeroPhysics
     {
-        public int speed { get; set; }
-
-        public Hero(int coordX, int coordY) : base(coordX, coordY, 16, 24, "HeroBloodShamanStand", 100)
+        public enum HeroClass
         {
-            this.speed = 2;
+            FireMage = 1,
+            IceMage = 2
+        }
+        private Clock skillClock { get; set; } = new Clock();
+        private Time skillDeltaTime { get; set; }
+        private float skillCooldown { get; set; } = 0;
 
+        private static Clock heroClock = new Clock();
+        private static Time attackedDeltaTime {  get; set; }
+        public int speed { get; set; }
+        public int coins { get; set; }
+        public int crystals { get; set; }
+        public float lastTimeDamage { get; set; } = 2;
+
+        public Hero(int coordX, int coordY, HeroClass playerClass) : base(coordX, coordY, 16, 24, GetAnimationKey(1, playerClass), 6)
+        {
+            this.playerClass = playerClass;
+            this.speed = 2;
         }
 
         ///////////////////////////////////////////
-        // Механика навыков
+        // Механика получения урона
 
         public override void Attacked()
         {
-            
+            attackedDeltaTime = heroClock.Restart();
+
+            if (lastTimeDamage < 1.5f)
+                lastTimeDamage += attackedDeltaTime.AsSeconds();
+
+            if (lastTimeDamage >= 1.5f)
+            {
+                lastTimeDamage = 0;
+                health -= 1;
+
+                if (health == 0)
+                {
+                    // ситуация, когда хп нету
+                }
+            }
         }
 
         ///////////////////////////////////////////
@@ -43,6 +71,11 @@ namespace EntityEngine
         public bool IsEscapeKeyPressed()
         {
             return Keyboard.IsKeyPressed(Keyboard.Key.Escape);
+        }
+
+        public bool IsSkillKeyPressed()
+        {
+            return Keyboard.IsKeyPressed(Keyboard.Key.Q);
         }
 
         public void Move()
@@ -89,6 +122,21 @@ namespace EntityEngine
                 MainWindow.window.Close();
             }
 
+            if (IsSkillKeyPressed())
+            {
+                
+                if (skillCooldown > 2)
+                {
+                    ViewHandler.CastSkill(playerClass);
+                    skillCooldown = 0;
+                }
+                else
+                {
+                    skillDeltaTime = skillClock.Restart();
+                    skillCooldown += skillDeltaTime.AsSeconds();
+                }
+            }
+
             Move();
             UpdatePhysics();
 
@@ -103,7 +151,7 @@ namespace EntityEngine
                 sprite.Scale = new Vector2f(1f, 1f);
                 sprite.Origin -= new Vector2f(16, 0);
                 prevDirection = Direction.right;
-            } 
+            }
             else if (direction == Direction.left && prevDirection == Direction.right)
             {
                 sprite.Scale = new Vector2f(-1f, 1f);

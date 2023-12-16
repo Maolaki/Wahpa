@@ -15,7 +15,9 @@ namespace WindowEngine
         public delegate void ProcessDelegate();
         public static List<GUIElement> GUIDraw = new List<GUIElement>();
         public static List<IUpdate> GUIUpdates = new List<IUpdate>();
-        public static List<AttackableEntityTemplate> EntityList = new List<AttackableEntityTemplate>();
+        public static List<AttackableEntityTemplate> Enemies = new List<AttackableEntityTemplate>();
+        public static List<Crystal> Crystals = new List<Crystal>();
+        public static List<SkillTemplate> Skills = new List<SkillTemplate>();
         public static LevelBackground levelBackground;
         private static Chunk[,]? chunkViewMap { get; set; }
         public static Tile[,]? tileViewMap { get; private set; }
@@ -31,7 +33,10 @@ namespace WindowEngine
         public static float viewSizeY { get; set; } = 336;
         public static float screenSizeX { get; set; } = 336;
         public static float screenSizeY { get; set; } = 336;
-        private static Hero? hero { get; set; }
+        public static Hero? hero { get; set; }
+
+        public static int choosenLevel { get; set; } = 1;
+        public static int gameStatus { get; set; } = 0;
 
         //////////////////////////////////////////////////////////////////////
         public static ProcessDelegate Update;
@@ -39,7 +44,7 @@ namespace WindowEngine
 
         public static void Start()
         {
-            LoadLevelOne();
+            LoadMainMenu();
         }
 
         public static void LoadMainMenu()
@@ -129,11 +134,12 @@ namespace WindowEngine
 
             GUIDraw.Add(new Pane(75, 0, 10, Data.GUIDict["Pane1"], 3));
 
+            GUIDraw.Add(new Label(21, -3, 13, 3, "Settings", Data.font1, 60, Color.Black));
             // ScreenSize label
-            GUIDraw.Add(new Label(20, -12, 20, 3, "Screen Size:", Data.font1, 60, Color.Black));
+            GUIDraw.Add(new Label(20, -12, 24, 3, "Screen Size:", Data.font1, 60, Color.Black));
 
             // FPS label
-            GUIDraw.Add(new Label(7, -12, 50, 3, "FPS:", Data.font1, 60, Color.Black));
+            GUIDraw.Add(new Label(7, -12, 47, 3, "FPS:", Data.font1, 60, Color.Black));
 
 
             // return button
@@ -150,7 +156,7 @@ namespace WindowEngine
 
             // comboBox screenSize
             string[] textBox1 = { "1920x1080", "1024x768", "800x600" };
-            ComboBox comboBox1 = new ComboBox(15, 12, 20, 3, textBox1);
+            ComboBox comboBox1 = new ComboBox(15, 12, 24, 3, textBox1);
             GUIDraw.Add(comboBox1);
             GUIUpdates.Add(comboBox1);
             comboBox1.SetText("1920x1080", Data.font1, 60, Color.Black);
@@ -169,13 +175,13 @@ namespace WindowEngine
             {
                 combo.DoClickFunc += () =>
                 {
-                    ChangeScreenSize(combo.Text.ToString());
+                    ChangeScreenSize(combo.Text.DisplayedString.ToString());
                 };
             }
 
             // comboBox fps
             string[] textBox2 = { "60", "45", "30" };
-            ComboBox comboBox2 = new ComboBox(15, 12, 50, 3, textBox2);
+            ComboBox comboBox2 = new ComboBox(15, 12, 47, 3, textBox2);
             GUIDraw.Add(comboBox2);
             GUIUpdates.Add(comboBox2);
             comboBox2.SetText("60", Data.font1, 60, Color.Black);
@@ -194,7 +200,7 @@ namespace WindowEngine
             {
                 combo.DoClickFunc += () =>
                 {
-                    ChangeFPSLimit(combo.Text.ToString());
+                    ChangeFPSLimit(combo.Text.DisplayedString.ToString());
                 };
             }
 
@@ -214,15 +220,19 @@ namespace WindowEngine
 
             GUIDraw.Add(new Pane(75, 0, 10, Data.GUIDict["Pane1"], 3));
 
-            GUIDraw.Add(new Label(30, 0, 10, 3, "Authorization", Data.font1, 60, Color.Black));
+            GUIDraw.Add(new Label(30, -3, 15, 3, "Authorization", Data.font1, 60, Color.Black));
 
-            GUIDraw.Add(new Label(10, -12, 25, 3, "Login:", Data.font1, 60, Color.Black));
+            GUIDraw.Add(new Label(10, -12, 30, 3, "Login:", Data.font1, 60, Color.Black));
 
-            GUIDraw.Add(new Label(14, -12, 35, 3, "Password:", Data.font1, 60, Color.Black));
+            GUIDraw.Add(new Label(14, -12, 50, 3, "Password:", Data.font1, 60, Color.Black));
 
-            TextField textField1 = new TextField(22, 15, 35, Data.GUIDict["TextField"], 3, false);
+            TextField textField1 = new TextField(22, 10, 31.5f, Data.GUIDict["TextField"], 3, false);
             GUIDraw.Add(textField1);
             GUIUpdates.Add(textField1);
+
+            TextField textField2 = new TextField(22, 10, 50.5f, Data.GUIDict["TextField"], 3, true);
+            GUIDraw.Add(textField2);
+            GUIUpdates.Add(textField2);
 
             // login button
             Button button1 = new Button(15, -15, 70, Data.GUIDict["Button1"], 3);
@@ -245,7 +255,67 @@ namespace WindowEngine
             {
                 Update -= UpdateGUIElements;
                 Draw -= DrawGUIElements;
+                LoadRegisterMenu();
+            };
+
+            view = new View(GUIDraw[0].Sprite.Position, (Vector2f)MainWindow.window.Size);
+            MainWindow.window.SetView(view);
+            UpdateGUIElements();
+        }
+
+        public static void LoadRegisterMenu()
+        {
+            GUIUpdates.Clear();
+            GUIDraw.Clear();
+            Update += UpdateGUIElements;
+            Draw += DrawGUIElements;
+
+            GUIDraw.Add(new Background(120, 0, 0, Data.background2));
+
+            GUIDraw.Add(new Pane(75, 0, 10, Data.GUIDict["Pane1"], 3));
+
+            GUIDraw.Add(new Label(30, -4, 14, 3, "Registration", Data.font1, 60, Color.Black));
+
+            GUIDraw.Add(new Label(10, -12, 30, 3, "Login:", Data.font1, 60, Color.Black));
+
+            GUIDraw.Add(new Label(14, -12, 40, 3, "Password:", Data.font1, 60, Color.Black));
+
+            GUIDraw.Add(new Label(20, -12, 50, 3, "Rep. Password:", Data.font1, 60, Color.Black));
+
+            TextField textField1 = new TextField(22, 10, 31.5f, Data.GUIDict["TextField"], 3, false);
+            GUIDraw.Add(textField1);
+            GUIUpdates.Add(textField1);
+
+            TextField textField2 = new TextField(22, 10, 40.5f, Data.GUIDict["TextField"], 3, true);
+            GUIDraw.Add(textField2);
+            GUIUpdates.Add(textField2);
+
+            TextField textField3 = new TextField(22, 10, 50.5f, Data.GUIDict["TextField"], 3, true);
+            GUIDraw.Add(textField3);
+            GUIUpdates.Add(textField3);
+
+            // reg in button
+            Button button1 = new Button(15, -15, 70, Data.GUIDict["Button1"], 3);
+            GUIDraw.Add(button1);
+            GUIUpdates.Add(button1);
+            button1.SetText("Reg In", Data.font1, 60, Color.Black);
+            button1.DoClickFunc += () =>
+            {
+                Update -= UpdateGUIElements;
+                Draw -= DrawGUIElements;
                 LoadMainMenu();
+            };
+
+            // register button
+            Button button2 = new Button(15, 15, 70, Data.GUIDict["Button1"], 3);
+            GUIDraw.Add(button2);
+            GUIUpdates.Add(button2);
+            button2.SetText("Authorization", Data.font1, 60, Color.Black);
+            button2.DoClickFunc += () =>
+            {
+                Update -= UpdateGUIElements;
+                Draw -= DrawGUIElements;
+                LoadLoginMenu();
             };
 
             view = new View(GUIDraw[0].Sprite.Position, (Vector2f)MainWindow.window.Size);
@@ -301,9 +371,52 @@ namespace WindowEngine
             };
         }
 
+        public static void LoadChooseLevelMenu()
+        {
+            GUIUpdates.Clear();
+            GUIDraw.Clear();
+            Update += UpdateGUIElements;
+            Draw += DrawGUIElements;
+
+            GUIDraw.Add(new Background(120, 0, 0, Data.background2));
+
+            GUIDraw.Add(new Pane(75, 0, 10, Data.GUIDict["Pane1"], 3));
+
+            GUIDraw.Add(new Label(30, -4, 14, 3, "Choose Level", Data.font1, 60, Color.Black));
+
+            // return button
+            Button button1 = new Button(30, 0, 35, Data.GUIDict["Button2"], 3);
+            GUIDraw.Add(button1);
+            GUIUpdates.Add(button1);
+            button1.SetText("Wood House", Data.font1, 60, Color.White);
+            button1.DoClickFunc += () =>
+            {
+                Update -= UpdateGUIElements;
+                Draw -= DrawGUIElements;
+                LoadMainMenu();
+            };
+
+            // return button
+            Button button2 = new Button(30, 0, 55, Data.GUIDict["Button3"], 3);
+            GUIDraw.Add(button2);
+            GUIUpdates.Add(button2);
+            button2.SetText("Stone Cave", Data.font1, 60, Color.White);
+            button2.DoClickFunc += () =>
+            {
+                Update -= UpdateGUIElements;
+                Draw -= DrawGUIElements;
+                LoadMainMenu();
+            };
+
+        }
+
         public static void LoadLevelOne()
         {
-            hero = new Hero(324, 136);
+            GUIUpdates.Clear();
+            GUIDraw.Clear();
+            gameStatus = 1;
+
+            hero = new Hero(324, 136, Hero.HeroClass.FireMage);
             MapEngine.LoadLevel(1);
             UpdateChunkViewMap(MapEngine.spawnRoom.startChunkX, MapEngine.spawnRoom.startChunkY, 5);
             UpdateTileViewMap();
@@ -311,19 +424,49 @@ namespace WindowEngine
 
             view = new View(hero.sprite.Position, new Vector2f(viewSizeX, viewSizeY));
 
+            Heart heart1 = new Heart(1, 1, 2, Data.GUIDict["HeartFull"], 1, 1);
+            Heart heart2 = new Heart(1, 1.6f, 2, Data.GUIDict["HeartFull"], 1, 3);
+            Heart heart3 = new Heart(1, 2.2f, 2, Data.GUIDict["HeartFull"], 1, 5);
+            GUIDraw.Add(heart1);
+            GUIDraw.Add(heart2);
+            GUIDraw.Add(heart3);
+            GUIUpdates.Add(heart1);
+            GUIUpdates.Add(heart2);
+            GUIUpdates.Add(heart3);
+
+            CoinCouter coinCouter = new CoinCouter(1, 15, 2, Data.GUIDict["Coin"], 1);
+
+            GUIDraw.Add(coinCouter);
+            GUIUpdates.Add(coinCouter);
+
             levelBackground = new LevelBackground(Data.background4, 110);
 
-            Update += hero.Update;
+            Update += UpdateGUIElements;
             Update += CheckExitCollision;
             Update += UpdatePlayViewSize;
             Update += levelBackground.Relocate;
+            Update += UpdateEntities;
 
             Draw += levelBackground.Draw;
             Draw += DrawMap;
+            Draw += DrawGUIElements;
             Draw += DrawEntities;
         }
 
         //////////////////////////////////////////////////////////////////////////
+
+        public static void CastSkill(Hero.HeroClass heroClass)
+        {
+            switch(heroClass)
+            {
+                case Hero.HeroClass.FireMage:
+                    Skills.Add(new SkillTemplate(hero.coordinateX + hero.sizeX, hero.coordinateY, 16, 12, "FireShamanBullet", hero.direction));
+                    break;
+                case Hero.HeroClass.IceMage:
+                    Skills.Add(new SkillTemplate(hero.coordinateX + hero.sizeX, hero.coordinateY, 16, 12, "IceShamanBullet", hero.direction));
+                    break;
+            }
+        }
 
         public static void DrawMap()
         {
@@ -340,17 +483,101 @@ namespace WindowEngine
 
         public static void DrawEntities()
         {
+            foreach (Crystal crystal in Crystals)
+            {
+                MainWindow.window.Draw(crystal.sprite);
+            }
+
+            foreach (AttackableEntityTemplate entity in Enemies)
+            {
+                MainWindow.window.Draw(entity.sprite);
+            }
+
+            foreach (SkillTemplate skill in Skills)
+            {
+                MainWindow.window.Draw(skill.sprite);
+            }
+
             MainWindow.window.Draw(hero.sprite);
+        }
+        public static void UpdateEntities()
+        {
+            if (gameStatus == 1)
+            {
+                hero.Update();
+
+                foreach (AttackableEntityTemplate entity in Enemies)
+                {
+                    if (Triggerable.CheckCollission(hero, entity))
+                    {
+                        hero.Attacked();
+                    }
+
+                    entity.Update();
+                }
+
+                List<Crystal> crystalsCopy = new List<Crystal>(Crystals);
+                foreach (Crystal crystal in crystalsCopy)
+                {
+                    if (Triggerable.CheckCollission(hero, crystal))
+                    {
+                        Crystals.Remove(crystal);
+                        hero.coins += 1;
+
+                        if (hero.crystals > 2)
+                        {
+
+                        }
+                    }
+                }
+
+                List<SkillTemplate> skillsCopy = new List<SkillTemplate>(Skills);
+                List<AttackableEntityTemplate> enemiesCopy = new List<AttackableEntityTemplate>(Enemies);
+                foreach (SkillTemplate skill in skillsCopy)
+                {
+                    skill.Update();
+
+                    foreach (AttackableEntityTemplate entity in enemiesCopy)
+                    {
+                        if (Triggerable.CheckCollission(entity, skill))
+                        {
+                            skill.Attack(entity);
+                        }
+                    }
+                }
+            }
+            
         }
 
         public static void ChangeScreenSize(string text)
         {
-            Console.WriteLine(text);
+            if (text == "1920x1080")
+            {
+                MainWindow.window.Close();
+                MainWindow.StartChanged();
+            }
+            else
+            {
+                uint[] windowSize = Data.SizesDict[text];
+                MainWindow.window.Close();
+                MainWindow.StartChanged(windowSize[0], windowSize[1]);
+            }
         }
 
         public static void ChangeFPSLimit(string text)
         {
-            Console.WriteLine(text);
+            switch (text)
+            {
+                case "60":
+                    MainWindow.window.SetFramerateLimit(60);
+                    break;
+                case "45":
+                    MainWindow.window.SetFramerateLimit(45);
+                    break;
+                default:
+                    MainWindow.window.SetFramerateLimit(30);
+                    break;
+            }
         }
 
         public static void UpdateGUIElements()
@@ -428,7 +655,7 @@ namespace WindowEngine
             Vector2 targetPosition = new Vector2(centerPositionX, centerPositionY);
 
             Vector2 temp = Vector2.Lerp(new Vector2(view.Center.X, view.Center.Y), targetPosition, 0.1f);
-            view.Center = new SFML.System.Vector2f(temp.X, temp.Y);
+            view.Center = new Vector2f(temp.X, temp.Y);
 
             MainWindow.window.SetView(view);
         }
@@ -476,6 +703,9 @@ namespace WindowEngine
                 }
             }
 
+            Enemies.Clear();
+            Skills.Clear();
+            Crystals.Clear();
             exitArray.Clear();
         }
 
@@ -491,8 +721,6 @@ namespace WindowEngine
                     
             }
         }
-
-
 
         //////////////////////////////////////////////////////////////////////
         private static void UpdateTileViewMap()
@@ -513,6 +741,16 @@ namespace WindowEngine
                             {
                                 tileViewMap[i * 11 + i1 + 5, j * 11 + j1 + 5] = new Tile(TileType.wall);
                                 tileViewMap[i * 11 + i1 + 5, j * 11 + j1 + 5].sprite.Position = new Vector2f(i * 11 * 16 + (i1 + 5) * 16, j * 11 * 16 + (j1 + 5) * 16);
+                            }
+                            else if (charTileArray[i1, j1] == 'M')
+                            {
+                                tileViewMap[i * 11 + i1 + 5, j * 11 + j1 + 5] = new Tile(TileType.empty);
+                                Enemies.Add(new WalkedMonster((i * 11 + i1 + 5) * 16, (j * 11 + j1 + 5) * 16 - 8, 16, 24, "SkeletonRun"));
+                            }
+                            else if (charTileArray[i1, j1] == 'C')
+                            {
+                                tileViewMap[i * 11 + i1 + 5, j * 11 + j1 + 5] = new Tile(TileType.empty);
+                                Crystals.Add(new Crystal((i * 11 + i1 + 5) * 16, (j * 11 + j1 + 5) * 16 - 8, 16, 24));
                             }
                             else
                             {
@@ -623,7 +861,7 @@ namespace WindowEngine
             }
         }
 
-        private static void UpdateChunkViewMap(int chunkX, int chunkY, int route) 
+        private static void UpdateChunkViewMap(int chunkX, int chunkY, int route)
         {
             Room room = MapEngine.chunkMap[chunkX, chunkY].room;
             chunkStartX = room.startChunkX;
@@ -666,10 +904,11 @@ namespace WindowEngine
                     hero.coordinateX = (chunkSizeX / 2 * 11 * 16) + (5 * 16) - 12;
                     break;
             }
-            
-            
+
+            view = new View(hero.sprite.Position, new Vector2f(viewSizeX, viewSizeY));
+            MainWindow.window.SetView(view);
         }
 
-        
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using SFML.Graphics;
+﻿using DatabaseEngine;
+using SFML.Graphics;
 using SFML.Window;
 using WindowEngine;
 
@@ -7,8 +8,6 @@ class Program
     static void Main(string[] args)
     {
         MainWindow.Start();
-
-      //  MainWindow.window.SetActive(false);
 
         while (MainWindow.window.IsOpen)
         {
@@ -19,7 +18,6 @@ class Program
 
     static void Render(RenderWindow window)
     {
-      //  window.SetActive(true);
 
         MainWindow.Draw();
 

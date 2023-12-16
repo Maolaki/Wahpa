@@ -8,13 +8,21 @@ namespace EntityEngine
 {
     internal abstract class EntityPhysics : AttackableEntityTemplate
     {
+        public enum Direction
+        {
+            right,
+            left
+        }
+        public Direction direction { get; protected set; }
+        public Direction prevDirection { get; protected set; }
+
         public int sizeX { get; private set; }
         public int sizeY { get; private set; }
         private List<Texture> animList { get; set; }
         private float lastCallTime = 0;
         private int animNumber = 0;
 
-        protected EntityPhysics(int coordinateX, int coordinateY, int sizeX, int sizeY, string animName, float health) : base(true, health)
+        protected EntityPhysics(int coordinateX, int coordinateY, int sizeX, int sizeY, string animName, int health) : base(true, health)
         {
             this.sizeX = sizeX;
             this.sizeY = sizeY;
@@ -23,7 +31,7 @@ namespace EntityEngine
             this.coordinateX = coordinateX;
             this.coordinateY = coordinateY;
             this.SetAnimation(animName);
-            this.sprite.Origin = new Vector2f(0,0);
+            this.sprite.Origin = new Vector2f(0, 0);
             this.sprite.Position = new Vector2f(coordinateX, coordinateY);
         }
 
@@ -58,7 +66,7 @@ namespace EntityEngine
             int coordX;
             int coordY;
             int moveableLength = 0;
-            
+
             for (coordY = coordinateY - 1; coordY > coordinateY - length; coordY -= 1)
             {
                 for (coordX = coordinateX; coordX < coordinateX + sizeX; coordX += 4)
@@ -131,6 +139,29 @@ namespace EntityEngine
             }
 
             return moveableLength;
+        }
+
+        protected bool CheckEndRight()
+        {
+            int coordX = coordinateX + sizeX;
+            int coordY = coordinateY + sizeY;
+
+            MapGen.Tile checkedTile = ViewHandler.tileViewMap[coordX / Data.tileSize, coordY / Data.tileSize];
+            if (checkedTile.type == MapGen.TileType.empty)
+                return true;
+
+            return false;
+        }
+        protected bool CheckEndLeft()
+        {
+            int coordX = coordinateX - 1;
+            int coordY = coordinateY + sizeY;
+
+            MapGen.Tile checkedTile = ViewHandler.tileViewMap[coordX / Data.tileSize, coordY / Data.tileSize];
+            if (checkedTile.type == MapGen.TileType.empty)
+                return true;
+
+            return false;
         }
 
         public void MoveUp(int length)

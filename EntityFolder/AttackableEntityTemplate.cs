@@ -9,9 +9,9 @@ namespace EntityEngine
     internal abstract class AttackableEntityTemplate : Triggerable
     {
         public bool killable { get; set; }
-        public float health { get; set; }
+        public int health { get; set; }
 
-        protected AttackableEntityTemplate(bool killable, float health = 0)
+        protected AttackableEntityTemplate(bool killable, int health = 0)
         {
             this.killable = killable;
             this.health = health;
@@ -19,6 +19,5 @@ namespace EntityEngine
 
         public abstract void Attacked();
 
-        public abstract void Update();
     }
 }

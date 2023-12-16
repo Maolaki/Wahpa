@@ -1,9 +1,13 @@
-﻿namespace EntityEngine
+﻿using SFML.Graphics;
+
+namespace EntityEngine
 {
     internal class BarrelEntity : AttackableEntityTemplate
     {
-        BarrelEntity() : base(false, 0f)
-        { }
+        BarrelEntity(float sizeX ,Texture texture) : base(true , 1)
+        { 
+
+        }
 
         public override void Attacked()
         {
