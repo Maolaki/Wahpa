@@ -10,7 +10,51 @@ namespace DatabaseEngine
 {
     internal static class DataBase
     {
-        public static void DBGetRowsCount(out int rows)
+
+        public static User logUser {  get; set; }
+        public static int userLen {  get; set; }
+        public static List<User> users {  get; set; }
+
+        public static int page {  get; set; }
+
+        public static void DBInitUsers()
+        {
+            users = new List<User>();
+
+            string constr = "Server=localhost;Database=Wahpa;Uid=root;Pwd=1111;";
+
+            using (MySqlConnection conn = new MySqlConnection(constr))
+            {
+                conn.Open();
+
+                using (MySqlCommand cmd = new MySqlCommand())
+                {
+                    cmd.Connection = conn;
+                    cmd.CommandType = CommandType.Text;
+                    // Изменяем запрос так, чтобы сортировать пользователей по убыванию количества монет
+                    cmd.CommandText = "SELECT login, password, coins, access, mageClass FROM users ORDER BY coins DESC";
+
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            User user = new User();
+                            user.login = reader.GetString(0);
+                            user.password = reader.GetString(1);
+                            user.coins = reader.GetInt32(2);
+                            user.access = reader.GetBoolean(3);
+                            user.mageClass = reader.GetInt32(4);
+
+                            users.Add(user);
+                        }
+                    }
+                }
+
+                conn.Close();
+            }
+        }
+
+        public static void DBGetRowsCount()
         {
             string constr = "Server=localhost;Database=Wahpa;Uid=root;Pwd=1111;";
             DataTable dt = new DataTable();
@@ -28,7 +72,7 @@ namespace DatabaseEngine
                 conn.Close();
             }
 
-            rows = dt.Rows.Count;
+            userLen = dt.Rows.Count;
         }
 
         public static void DBAddUser(string login, string password, int mageClass)
@@ -81,7 +125,7 @@ namespace DatabaseEngine
             }
         }
 
-        public static bool DBCheckUser(string login)
+        public static bool DBCheckLogin(string login)
         {
             string constr = "Server=localhost;Database=Wahpa;Uid=root;Pwd=1111;";
 
@@ -106,7 +150,7 @@ namespace DatabaseEngine
             }
         }
 
-        public static void DBBlock(string login, bool access)
+        public static void DBBlock(string login)
         {
             string constr = "Server=localhost;Database=Wahpa;Uid=root;Pwd=1111;";
 
@@ -121,7 +165,7 @@ namespace DatabaseEngine
                     cmd.CommandText = "UPDATE users SET access = @access WHERE login = @login";
 
                     cmd.Parameters.AddWithValue("@login", login);
-                    cmd.Parameters.AddWithValue("@access", access);
+                    cmd.Parameters.AddWithValue("@access", false);
 
                     cmd.ExecuteNonQuery();
                 }
@@ -130,7 +174,7 @@ namespace DatabaseEngine
             }
         }
 
-        public static bool DBVerifyUser(string login, string password)
+        public static bool DBLogUser(string login, string password)
         {
             string constr = "Server=localhost;Database=Wahpa;Uid=root;Pwd=1111;";
 
@@ -142,18 +186,60 @@ namespace DatabaseEngine
                 {
                     cmd.Connection = conn;
                     cmd.CommandType = CommandType.Text;
-                    cmd.CommandText = "SELECT COUNT(*) FROM users WHERE login = @login AND password = @password";
+                    cmd.CommandText = "SELECT * FROM users WHERE login = @login AND password = @password";
 
                     cmd.Parameters.AddWithValue("@login", login);
                     cmd.Parameters.AddWithValue("@password", password);
 
-                    int count = Convert.ToInt32(cmd.ExecuteScalar());
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read() && reader.GetBoolean(3) == true)
+                        {
+                            logUser = new User();
+                            logUser.login = reader.GetString(0);
+                            logUser.password = reader.GetString(1);
+                            logUser.coins = reader.GetInt32(2);
+                            logUser.access = reader.GetBoolean(3);
+                            logUser.mageClass = reader.GetInt32(4);
 
-                    conn.Close();
+                            conn.Close();
 
-                    return count > 0; 
+                            return true; 
+                        }
+                        else
+                        {
+                            conn.Close();
+
+                            return false; 
+                        }
+                    }
                 }
             }
         }
+
+        public static void DBAddCoins(int coins)
+        {
+            string constr = "Server=localhost;Database=Wahpa;Uid=root;Pwd=1111;";
+
+            using (MySqlConnection conn = new MySqlConnection(constr))
+            {
+                conn.Open();
+
+                using (MySqlCommand cmd = new MySqlCommand())
+                {
+                    cmd.Connection = conn;
+                    cmd.CommandType = CommandType.Text;
+                    cmd.CommandText = "UPDATE users SET coins = coins + @coins WHERE login = @login";
+
+                    cmd.Parameters.AddWithValue("@login", logUser.login);
+                    cmd.Parameters.AddWithValue("@coins", coins);
+
+                    cmd.ExecuteNonQuery();
+                }
+
+                conn.Close();
+            }
+        }
+
     }
 }

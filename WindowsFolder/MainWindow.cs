@@ -37,8 +37,6 @@ namespace WindowEngine
             window.Resized += _Resized;
 
             ViewHandler.Start();
-
-            DataBase.DBtest();
         }
 
         public static void StartChanged()

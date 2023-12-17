@@ -1,7 +1,9 @@
-﻿using EntityEngine;
+﻿using DatabaseEngine;
+using EntityEngine;
 using MapGen;
 using SFML.Graphics;
 using SFML.System;
+using SFML.Window;
 using System.Net.Http.Headers;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -18,7 +20,8 @@ namespace WindowEngine
         public static List<AttackableEntityTemplate> Enemies = new List<AttackableEntityTemplate>();
         public static List<Crystal> Crystals = new List<Crystal>();
         public static List<SkillTemplate> Skills = new List<SkillTemplate>();
-        public static LevelBackground levelBackground;
+        public static LevelBackground levelBackground { get; set; }
+        public static int levelType {  get; set; }
         private static Chunk[,]? chunkViewMap { get; set; }
         public static Tile[,]? tileViewMap { get; private set; }
         private static List<ExitEntity> exitArray { get; set; }
@@ -44,7 +47,7 @@ namespace WindowEngine
 
         public static void Start()
         {
-            LoadMainMenu();
+            LoadLoginMenu();
         }
 
         public static void LoadMainMenu()
@@ -65,7 +68,7 @@ namespace WindowEngine
             {
                 Update -= UpdateGUIElements;
                 Draw -= DrawGUIElements;
-                LoadLevelOne();
+                LoadChooseLevelMenu();
             };
 
 
@@ -241,9 +244,7 @@ namespace WindowEngine
             button1.SetText("Log In", Data.font1, 60, Color.Black);
             button1.DoClickFunc += () =>
             {
-                Update -= UpdateGUIElements;
-                Draw -= DrawGUIElements;
-                LoadMainMenu();
+                LogInFunction(textField1.text, textField2.text);
             };
 
             // register button
@@ -256,6 +257,16 @@ namespace WindowEngine
                 Update -= UpdateGUIElements;
                 Draw -= DrawGUIElements;
                 LoadRegisterMenu();
+            };
+
+            // exit button
+            Button button4 = new Button(15, 0, 90, Data.GUIDict["Button1"], 3);
+            GUIDraw.Add(button4);
+            GUIUpdates.Add(button4);
+            button4.SetText("Exit", Data.font1, 60, Color.Black);
+            button4.DoClickFunc += () =>
+            {
+                MainWindow.window.Close();
             };
 
             view = new View(GUIDraw[0].Sprite.Position, (Vector2f)MainWindow.window.Size);
@@ -301,9 +312,7 @@ namespace WindowEngine
             button1.SetText("Reg In", Data.font1, 60, Color.Black);
             button1.DoClickFunc += () =>
             {
-                Update -= UpdateGUIElements;
-                Draw -= DrawGUIElements;
-                LoadMainMenu();
+                RegisterFunction(textField1.text, textField2.text, textField3.text);
             };
 
             // register button
@@ -316,6 +325,16 @@ namespace WindowEngine
                 Update -= UpdateGUIElements;
                 Draw -= DrawGUIElements;
                 LoadLoginMenu();
+            };
+
+            // exit button
+            Button button4 = new Button(15, 0, 90, Data.GUIDict["Button1"], 3);
+            GUIDraw.Add(button4);
+            GUIUpdates.Add(button4);
+            button4.SetText("Exit", Data.font1, 60, Color.Black);
+            button4.DoClickFunc += () =>
+            {
+                MainWindow.window.Close();
             };
 
             view = new View(GUIDraw[0].Sprite.Position, (Vector2f)MainWindow.window.Size);
@@ -334,8 +353,42 @@ namespace WindowEngine
 
             GUIDraw.Add(new Pane(75, 0, 10, Data.GUIDict["Pane1"], 3));
 
+            DataBase.DBGetRowsCount();
+            DataBase.DBInitUsers();
+            DataBase.page = 1;
+
+            GUIDraw.Add(new Label(15, -2.5f, 14, 3, "Rating", Data.font1, 60, Color.Black));
+
+            Label label1 = new Label(10, -12, 25, 3, "User1", Data.font1, 60, Color.Black);
+            Label label2 = new Label(10, -12, 35, 3, "User2", Data.font1, 60, Color.Black);
+            Label label3 = new Label(10, -12, 45, 3, "User3", Data.font1, 60, Color.Black);
+            Label label4 = new Label(10, -12, 55, 3, "User4", Data.font1, 60, Color.Black);
+            Label label5 = new Label(10, -12, 65, 3, "User5", Data.font1, 60, Color.Black);
+
+            Label[] logins = new Label[] { label1, label2, label3, label4, label5 };
+
+            foreach (Label label in logins)
+            {
+                GUIDraw.Add(label);
+            }
+
+            Label label6 = new Label(5, 12, 24, 3, "0", Data.font1, 60, Color.Black);
+            Label label7 = new Label(5, 12, 34, 3, "0", Data.font1, 60, Color.Black);
+            Label label8 = new Label(5, 12, 44, 3, "0", Data.font1, 60, Color.Black);
+            Label label9 = new Label(5, 12, 54, 3, "0", Data.font1, 60, Color.Black);
+            Label label10 = new Label(5, 12, 64, 3, "0", Data.font1, 60, Color.Black);
+
+            Label[] coins = new Label[] { label6, label7, label8, label9, label10 };
+
+            foreach (Label label in coins)
+            {
+                GUIDraw.Add(label);
+            }
+
+            UpdatePageRating(logins, coins);
+
             // return button
-            Button button1 = new Button(15, 0, 70, Data.GUIDict["Button1"], 3);
+            Button button1 = new Button(15, 0, 80, Data.GUIDict["Button1"], 3);
             GUIDraw.Add(button1);
             GUIUpdates.Add(button1);
             button1.SetText("Return", Data.font1, 60, Color.Black);
@@ -348,27 +401,195 @@ namespace WindowEngine
 
             // left button
             Button button2 = new Button(5, -20, 70, Data.GUIDict["ArrowLeft"], 3);
-            GUIDraw.Add(button2);
-            GUIUpdates.Add(button2);
             button2.SetText("", Data.font1, 60, Color.Black);
-            button2.DoClickFunc += () =>
-            {
-                Update -= UpdateGUIElements;
-                Draw -= DrawGUIElements;
-                LoadMainMenu();
-            };
+
 
             // right button
             Button button3 = new Button(5, 20, 70, Data.GUIDict["ArrowRight"], 3);
-            GUIDraw.Add(button3);
-            GUIUpdates.Add(button3);
             button3.SetText("", Data.font1, 60, Color.Black);
+
+            if (DataBase.page * 5 < DataBase.userLen)
+            {
+                GUIDraw.Add(button3);
+                GUIUpdates.Add(button3);
+            }
+
+            button2.DoClickFunc += () =>
+            {
+                if (DataBase.page == 2)
+                {
+                    GUIDraw.Remove(button2);
+                    GUIUpdates.Remove(button2);
+                }
+                DataBase.page -= 1;
+                if (DataBase.page * 5 < DataBase.userLen)
+                {
+                    GUIDraw.Add(button3);
+                    GUIUpdates.Add(button3);
+                }
+                UpdatePageRating(logins, coins);
+            };
+
             button3.DoClickFunc += () =>
+            {
+                if (DataBase.page == 1)
+                {
+                    GUIDraw.Add(button2);
+                    GUIUpdates.Add(button2);
+                }
+                DataBase.page += 1;
+                if (DataBase.page * 5 >= DataBase.userLen)
+                {
+                    GUIDraw.Remove(button3);
+                    GUIUpdates.Remove(button3);
+                }
+                UpdatePageRating(logins, coins);
+            };
+
+        }
+
+        public static void LoadAdminMenu()
+        {
+            GUIUpdates.Clear();
+            GUIDraw.Clear();
+            Update += UpdateGUIElements;
+            Draw += DrawGUIElements;
+
+            GUIDraw.Add(new Background(120, 0, 0, Data.background2));
+
+            GUIDraw.Add(new Pane(75, 0, 10, Data.GUIDict["Pane1"], 3));
+
+            DataBase.DBGetRowsCount();
+            DataBase.DBInitUsers();
+            DataBase.page = 1;
+
+            GUIDraw.Add(new Label(20, -1, 14, 3, "Admin Panel", Data.font1, 60, Color.Black));
+
+            Label label1 = new Label(10, -15, 25, 3, "User1", Data.font1, 60, Color.Black);
+            Label label2 = new Label(10, -15, 35, 3, "User2", Data.font1, 60, Color.Black);
+            Label label3 = new Label(10, -15, 45, 3, "User3", Data.font1, 60, Color.Black);
+            Label label4 = new Label(10, -15, 55, 3, "User4", Data.font1, 60, Color.Black);
+            Label label5 = new Label(10, -15, 65, 3, "User5", Data.font1, 60, Color.Black);
+
+            Label[] logins = new Label[] { label1, label2, label3, label4, label5 };
+
+            foreach (Label label in logins)
+            {
+                GUIDraw.Add(label);
+            }
+
+            Label label6 = new Label(10, 0, 24, 3, "0", Data.font1, 60, Color.Black);
+            Label label7 = new Label(10, 0, 34, 3, "0", Data.font1, 60, Color.Black);
+            Label label8 = new Label(10, 0, 44, 3, "0", Data.font1, 60, Color.Black);
+            Label label9 = new Label(10, 0, 54, 3, "0", Data.font1, 60, Color.Black);
+            Label label10 = new Label(10, 0, 64, 3, "0", Data.font1, 60, Color.Black);
+
+            Label[] passwords = new Label[] { label6, label7, label8, label9, label10 };
+
+            foreach (Label label in passwords)
+            {
+                GUIDraw.Add(label);
+            }
+
+            Label label11 = new Label(3, 15, 24, 3, "0", Data.font1, 60, Color.Black);
+            Label label12 = new Label(3, 15, 34, 3, "0", Data.font1, 60, Color.Black);
+            Label label13 = new Label(3, 15, 44, 3, "0", Data.font1, 60, Color.Black);
+            Label label14 = new Label(3, 15, 54, 3, "0", Data.font1, 60, Color.Black);
+            Label label15 = new Label(3, 15, 64, 3, "0", Data.font1, 60, Color.Black);
+
+            Label[] coins = new Label[] { label11, label12, label13, label14, label15 };
+
+            foreach (Label label in coins)
+            {
+                GUIDraw.Add(label);
+            }
+
+            Button buttonD1 = new Button(5, 25, 24, Data.GUIDict["Button6"], 3);
+            Button buttonD2 = new Button(5, 25, 34, Data.GUIDict["Button6"], 3);
+            Button buttonD3 = new Button(5, 25, 44, Data.GUIDict["Button6"], 3);
+            Button buttonD4 = new Button(5, 25, 54, Data.GUIDict["Button6"], 3);
+            Button buttonD5 = new Button(5, 25, 64, Data.GUIDict["Button6"], 3);
+
+            Button[] buttons = new Button[] { buttonD1, buttonD2, buttonD3, buttonD4, buttonD5 };
+
+            // left button
+            Button button2 = new Button(5, -20, 73, Data.GUIDict["ArrowLeft"], 3);
+            button2.SetText("", Data.font1, 60, Color.Black);
+
+
+            // right button
+            Button button3 = new Button(5, 20, 73, Data.GUIDict["ArrowRight"], 3);
+            button3.SetText("", Data.font1, 60, Color.Black);
+
+            buttonD1.DoClickFunc += () =>
+            {
+                DataBase.DBDeleteUser(label1.text.DisplayedString.ToString());
+                DataBase.DBGetRowsCount();
+                DataBase.DBInitUsers();
+                UpdateAdminMenuPage(logins, passwords, coins, buttons, button2, button3);
+            };
+            buttonD2.DoClickFunc += () =>
+            {
+                DataBase.DBDeleteUser(label2.text.DisplayedString.ToString());
+                DataBase.DBGetRowsCount();
+                DataBase.DBInitUsers();
+                UpdateAdminMenuPage(logins, passwords, coins, buttons, button2, button3);
+            };
+            buttonD3.DoClickFunc += () =>
+            {
+                DataBase.DBDeleteUser(label3.text.DisplayedString.ToString());
+                DataBase.DBGetRowsCount();
+                DataBase.DBInitUsers();
+                UpdateAdminMenuPage(logins, passwords, coins, buttons, button2, button3);
+            };
+            buttonD4.DoClickFunc += () =>
+            {
+                DataBase.DBDeleteUser(label4.text.DisplayedString.ToString());
+                DataBase.DBGetRowsCount();
+                DataBase.DBInitUsers();
+                UpdateAdminMenuPage(logins, passwords, coins, buttons, button2, button3);
+            };
+            buttonD5.DoClickFunc += () =>
+            {
+                DataBase.DBDeleteUser(label5.text.DisplayedString.ToString());
+                DataBase.DBGetRowsCount();
+                DataBase.DBInitUsers();
+                UpdateAdminMenuPage(logins, passwords, coins, buttons, button2, button3);
+            };
+
+            UpdateAdminMenuPage(logins, passwords, coins, buttons, button2, button3);
+
+            // return button
+            Button button1 = new Button(15, 0, 80, Data.GUIDict["Button1"], 3);
+            GUIDraw.Add(button1);
+            GUIUpdates.Add(button1);
+            button1.SetText("Return", Data.font1, 60, Color.Black);
+            button1.DoClickFunc += () =>
             {
                 Update -= UpdateGUIElements;
                 Draw -= DrawGUIElements;
-                LoadMainMenu();
+                LoadLoginMenu();
             };
+
+            if (DataBase.page * 5 < DataBase.userLen)
+            {
+                GUIDraw.Add(button3);
+                GUIUpdates.Add(button3);
+            }
+
+            button2.DoClickFunc += () =>
+            {
+                DataBase.page -= 1;
+                UpdateAdminMenuPage(logins, passwords, coins, buttons, button2, button3);
+            };
+
+            button3.DoClickFunc += () =>
+            {
+                DataBase.page += 1;
+                UpdateAdminMenuPage(logins, passwords, coins, buttons, button2, button3);
+            };
+
+
         }
 
         public static void LoadChooseLevelMenu()
@@ -384,7 +605,6 @@ namespace WindowEngine
 
             GUIDraw.Add(new Label(30, -4, 14, 3, "Choose Level", Data.font1, 60, Color.Black));
 
-            // return button
             Button button1 = new Button(30, 0, 35, Data.GUIDict["Button2"], 3);
             GUIDraw.Add(button1);
             GUIUpdates.Add(button1);
@@ -393,10 +613,10 @@ namespace WindowEngine
             {
                 Update -= UpdateGUIElements;
                 Draw -= DrawGUIElements;
-                LoadMainMenu();
+                levelType = 1;
+                LoadLevelOne();
             };
 
-            // return button
             Button button2 = new Button(30, 0, 55, Data.GUIDict["Button3"], 3);
             GUIDraw.Add(button2);
             GUIUpdates.Add(button2);
@@ -405,6 +625,48 @@ namespace WindowEngine
             {
                 Update -= UpdateGUIElements;
                 Draw -= DrawGUIElements;
+                levelType = 2;
+                LoadLevelOne();
+            };
+
+        }
+
+        public static void LoadChooseClassMenu(string login, string password)
+        {
+            GUIUpdates.Clear();
+            GUIDraw.Clear();
+            Update += UpdateGUIElements;
+            Draw += DrawGUIElements;
+
+            GUIDraw.Add(new Background(120, 0, 0, Data.background2));
+
+            GUIDraw.Add(new Pane(75, 0, 10, Data.GUIDict["Pane1"], 3));
+
+            GUIDraw.Add(new Label(30, -4, 14, 3, "Choose Class", Data.font1, 60, Color.Black));
+
+            Button button1 = new Button(30, 0, 35, Data.GUIDict["Button4"], 3);
+            GUIDraw.Add(button1);
+            GUIUpdates.Add(button1);
+            button1.SetText("Fire Shaman", Data.font1, 60, Color.White);
+            button1.DoClickFunc += () =>
+            {
+                Update -= UpdateGUIElements;
+                Draw -= DrawGUIElements;
+                DataBase.DBAddUser(login, password, 1);
+                DataBase.DBLogUser(login, password);
+                LoadMainMenu();
+            };
+
+            Button button2 = new Button(30, 0, 55, Data.GUIDict["Button5"], 3);
+            GUIDraw.Add(button2);
+            GUIUpdates.Add(button2);
+            button2.SetText("Ice Shaman", Data.font1, 60, Color.White);
+            button2.DoClickFunc += () =>
+            {
+                Update -= UpdateGUIElements;
+                Draw -= DrawGUIElements;
+                DataBase.DBAddUser(login, password, 2);
+                DataBase.DBLogUser(login, password);
                 LoadMainMenu();
             };
 
@@ -416,11 +678,15 @@ namespace WindowEngine
             GUIDraw.Clear();
             gameStatus = 1;
 
-            hero = new Hero(324, 136, Hero.HeroClass.FireMage);
+            hero = new Hero(324, 136, GetHeroClass());
             MapEngine.LoadLevel(1);
             UpdateChunkViewMap(MapEngine.spawnRoom.startChunkX, MapEngine.spawnRoom.startChunkY, 5);
             UpdateTileViewMap();
-            Tile.LoadBordersAndCorners(tileViewMap, Data.LEVEL1_WALL_TEXTURES);
+
+            if (levelType == 1)
+                Tile.LoadBordersAndCorners(tileViewMap, Data.LEVEL1_WALL_TEXTURES);
+            else
+                Tile.LoadBordersAndCorners(tileViewMap, Data.LEVEL2_WALL_TEXTURES);
 
             view = new View(hero.sprite.Position, new Vector2f(viewSizeX, viewSizeY));
 
@@ -439,7 +705,10 @@ namespace WindowEngine
             GUIDraw.Add(coinCouter);
             GUIUpdates.Add(coinCouter);
 
-            levelBackground = new LevelBackground(Data.background4, 110);
+            if (levelType == 1)
+                levelBackground = new LevelBackground(Data.background4, 110);
+            else
+                levelBackground = new LevelBackground(Data.background5, 110);
 
             Update += UpdateGUIElements;
             Update += CheckExitCollision;
@@ -453,7 +722,227 @@ namespace WindowEngine
             Draw += DrawEntities;
         }
 
+        public static void LoadLoseScreen()
+        {
+            gameStatus = 0;
+
+            View view = new View(new FloatRect(0, 0, 1920, 1080));
+            MainWindow.window.SetView(view);
+
+            GUIDraw.Clear();
+            GUIUpdates.Clear();
+            Enemies.Clear();
+            Skills.Clear();
+            Crystals.Clear();
+
+            Update -= CheckExitCollision;
+            Update -= UpdatePlayViewSize;
+            Update -= levelBackground.Relocate;
+            Update -= UpdateEntities;
+
+            Draw -= levelBackground.Draw;
+            Draw -= DrawMap;
+            Draw -= DrawEntities;
+
+            //Update += UpdateGUIElements;
+            //Draw += DrawGUIElements;
+
+            if (levelType == 1)
+                GUIDraw.Add(new Background(120, 0, 0, Data.background4));
+            else
+                GUIDraw.Add(new Background(120, 0, 0, Data.background5));
+
+
+            GUIDraw.Add(new Pane(75, 0, 10, Data.GUIDict["Pane1"], 3));
+
+            GUIDraw.Add(new Label(30, -4, 14, 3, "Lose Screen", Data.font1, 60, Color.Black));
+
+            GUIDraw.Add(new Label(40, 10, 55, 3, "You're character have " + DataBase.logUser.coins.ToString() + " coins!", Data.font1, 60, Color.Black));
+
+            Button button1 = new Button(15, 0, 80, Data.GUIDict["Button1"], 3);
+            GUIDraw.Add(button1);
+            GUIUpdates.Add(button1);
+            button1.SetText("Continue", Data.font1, 60, Color.Black);
+            button1.DoClickFunc += () =>
+            {
+                DataBase.DBBlock(DataBase.logUser.login);
+
+                LoadLoginMenu();
+            };
+        }
+
+        public static void LoadWinScreen()
+        {
+            gameStatus = 0;
+
+            View view = new View(new FloatRect(0, 0, 1920, 1080));
+            MainWindow.window.SetView(view);
+
+            GUIDraw.Clear();
+            GUIUpdates.Clear();
+            Enemies.Clear();
+            Skills.Clear();
+            Crystals.Clear();
+
+            Update -= CheckExitCollision;
+            Update -= UpdatePlayViewSize;
+            Update -= levelBackground.Relocate;
+            Update -= UpdateEntities;
+
+            Draw -= levelBackground.Draw;
+            Draw -= DrawMap;
+            Draw -= DrawEntities;
+
+            if (levelType == 1)
+                GUIDraw.Add(new Background(120, 0, 0, Data.background4));
+            else
+                GUIDraw.Add(new Background(120, 0, 0, Data.background5));
+
+            GUIDraw.Add(new Pane(75, 0, 10, Data.GUIDict["Pane1"], 3));
+
+            GUIDraw.Add(new Label(30, -4, 14, 3, "Win Screen", Data.font1, 60, Color.Black));
+
+            DataBase.DBAddCoins(hero.coins);
+            DataBase.DBLogUser(DataBase.logUser.login, DataBase.logUser.password);
+
+            GUIDraw.Add(new Label(40, 10, 55, 3, "You're character have " + DataBase.logUser.coins.ToString() + " coins!", Data.font1, 60, Color.Black));
+
+            Button button1 = new Button(15, 0, 80, Data.GUIDict["Button1"], 3);
+            GUIDraw.Add(button1);
+            GUIUpdates.Add(button1);
+            button1.SetText("Continue", Data.font1, 60, Color.Black);
+            button1.DoClickFunc += () =>
+            {
+                GUIDraw.Clear();
+                GUIUpdates.Clear();
+                Enemies.Clear();
+                Skills.Clear();
+                Crystals.Clear();
+
+                Update = null;
+                Draw = null;
+
+                LoadMainMenu();
+            };
+        }
+
         //////////////////////////////////////////////////////////////////////////
+
+        public static Hero.HeroClass GetHeroClass()
+        {
+            if (DataBase.logUser.mageClass == 1)
+            {
+                return Hero.HeroClass.FireMage;
+            }
+            else
+            {
+                return Hero.HeroClass.IceMage;
+            }
+        }
+
+        public static void EscFunction()
+        {
+           
+        }
+
+        public static void LogInFunction(string login, string password)
+        {
+            if (login == "admin" && password == "admin")
+            {
+                Update -= UpdateGUIElements;
+                Draw -= DrawGUIElements;
+                LoadAdminMenu();
+            }
+            else if (DataBase.DBLogUser(login, password))
+            {
+                Update -= UpdateGUIElements;
+                Draw -= DrawGUIElements;
+                LoadMainMenu();
+            }
+
+        }
+
+        public static void RegisterFunction(string login, string password, string repPassword)
+        {
+            if (login != "admin" && password == repPassword && DataBase.DBCheckLogin(login))
+            {
+                Update -= UpdateGUIElements;
+                Draw -= DrawGUIElements;
+                LoadChooseClassMenu(login, password);
+            }
+        }
+
+        public static void UpdateAdminMenuPage(Label[] logins, Label[] passwords, Label[] coins, Button[] buttons, Button left, Button right)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                if (DataBase.userLen < DataBase.page * 5 + i - 4)
+                {
+                    logins[i].text.DisplayedString = "";
+                    passwords[i].text.DisplayedString = "";
+                    coins[i].text.DisplayedString = "";
+                    GUIDraw.Remove(buttons[i]);
+                    GUIUpdates.Remove(buttons[i]);
+                    continue;
+                }
+
+                logins[i].text.DisplayedString = DataBase.users[DataBase.page * 5 - 5 + i].login;
+                passwords[i].text.DisplayedString = DataBase.users[DataBase.page * 5 - 5 + i].password;
+                if (DataBase.users[DataBase.page * 5 - 5 + i].access)
+                    logins[i].text.Color = Color.Green;
+                else
+                    logins[i].text.Color = Color.Red;
+
+                coins[i].text.DisplayedString = DataBase.users[DataBase.page * 5 - 5 + i].coins.ToString();
+                GUIDraw.Remove(buttons[i]);
+                GUIUpdates.Remove(buttons[i]);
+                GUIDraw.Add(buttons[i]);
+                GUIUpdates.Add(buttons[i]);
+
+
+            }
+
+            GUIDraw.Remove(right);
+            GUIUpdates.Remove(right);
+            GUIDraw.Add(left);
+            GUIUpdates.Add(left);
+            if (DataBase.page == 1)
+            {
+                GUIDraw.Remove(left);
+                GUIUpdates.Remove(left);
+            }
+
+            GUIDraw.Remove(right);
+            GUIUpdates.Remove(right);
+            GUIDraw.Add(right);
+            GUIUpdates.Add(right);
+            if (DataBase.page * 5 >= DataBase.userLen)
+            {
+                GUIDraw.Remove(right);
+                GUIUpdates.Remove(right);
+            }
+        }
+
+        public static void UpdatePageRating(Label[] logins, Label[] coins)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                if (DataBase.userLen < DataBase.page * 5 + i - 4)
+                {
+                    logins[i].text.DisplayedString = "";
+                    coins[i].text.DisplayedString = "";
+                    continue;
+                }
+
+                logins[i].text.DisplayedString = DataBase.users[DataBase.page * 5 - 5 + i].login;
+                if (DataBase.users[DataBase.page * 5 - 5 + i].access)
+                    logins[i].text.Color = Color.Green;
+                else
+                    logins[i].text.Color = Color.Red;
+
+                coins[i].text.DisplayedString = DataBase.users[DataBase.page * 5 - 5 + i].coins.ToString();
+            }
+        }
 
         public static void CastSkill(Hero.HeroClass heroClass)
         {
@@ -506,7 +995,8 @@ namespace WindowEngine
             {
                 hero.Update();
 
-                foreach (AttackableEntityTemplate entity in Enemies)
+                List<AttackableEntityTemplate> enemiesCopy = new List<AttackableEntityTemplate>(Enemies);
+                foreach (AttackableEntityTemplate entity in enemiesCopy)
                 {
                     if (Triggerable.CheckCollission(hero, entity))
                     {
@@ -522,17 +1012,16 @@ namespace WindowEngine
                     if (Triggerable.CheckCollission(hero, crystal))
                     {
                         Crystals.Remove(crystal);
-                        hero.coins += 1;
+                        hero.crystals += 1;
 
                         if (hero.crystals > 2)
                         {
-
+                            LoadWinScreen();
                         }
                     }
                 }
 
                 List<SkillTemplate> skillsCopy = new List<SkillTemplate>(Skills);
-                List<AttackableEntityTemplate> enemiesCopy = new List<AttackableEntityTemplate>(Enemies);
                 foreach (SkillTemplate skill in skillsCopy)
                 {
                     skill.Update();
@@ -690,7 +1179,11 @@ namespace WindowEngine
             }
 
             UpdateTileViewMap();
-            Tile.LoadBordersAndCorners(tileViewMap, Data.LEVEL1_WALL_TEXTURES);
+
+            if (levelType == 1)
+                Tile.LoadBordersAndCorners(tileViewMap, Data.LEVEL1_WALL_TEXTURES);
+            else
+                Tile.LoadBordersAndCorners(tileViewMap, Data.LEVEL2_WALL_TEXTURES);
         }
 
         public static void ResetSprites()
@@ -745,7 +1238,10 @@ namespace WindowEngine
                             else if (charTileArray[i1, j1] == 'M')
                             {
                                 tileViewMap[i * 11 + i1 + 5, j * 11 + j1 + 5] = new Tile(TileType.empty);
-                                Enemies.Add(new WalkedMonster((i * 11 + i1 + 5) * 16, (j * 11 + j1 + 5) * 16 - 8, 16, 24, "SkeletonRun"));
+                                if (levelType == 1)
+                                    Enemies.Add(new WalkedMonster((i * 11 + i1 + 5) * 16, (j * 11 + j1 + 5) * 16 - 8, 16, 24, "SkeletonRun"));
+                                else
+                                    Enemies.Add(new WalkedMonster((i * 11 + i1 + 5) * 16, (j * 11 + j1 + 5) * 16 - 12, 16, 28, "GolemRun"));
                             }
                             else if (charTileArray[i1, j1] == 'C')
                             {

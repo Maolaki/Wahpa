@@ -45,7 +45,7 @@ namespace EntityEngine
 
                 if (health == 0)
                 {
-                    // ситуация, когда хп нету
+                    ViewHandler.LoadLoseScreen();
                 }
             }
         }
@@ -66,11 +66,6 @@ namespace EntityEngine
         public bool IsRightKeyPressed()
         {
             return Keyboard.IsKeyPressed(Keyboard.Key.D) || Keyboard.IsKeyPressed(Keyboard.Key.Right);
-        }
-
-        public bool IsEscapeKeyPressed()
-        {
-            return Keyboard.IsKeyPressed(Keyboard.Key.Escape);
         }
 
         public bool IsSkillKeyPressed()
@@ -117,11 +112,6 @@ namespace EntityEngine
 
         public override void Update()
         {
-            if (IsEscapeKeyPressed())
-            {
-                MainWindow.window.Close();
-            }
-
             if (IsSkillKeyPressed())
             {
                 

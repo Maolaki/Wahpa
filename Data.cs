@@ -21,6 +21,7 @@ public static class Data
     public static readonly String LEVEL1_FIVE_FIVE = "..\\..\\..\\MapTemplates\\Level1Templates\\five_five\\1.txt";
 
     public static readonly String LEVEL1_WALL_TEXTURES = "..\\..\\..\\Texture\\WoodPlanks";
+    public static readonly String LEVEL2_WALL_TEXTURES = "..\\..\\..\\Texture\\StoneWalls";
 
     public static readonly Font font1 = new Font("..\\..\\..\\Fonts\\MinecraftBold.otf");
     public static readonly Font font2 = new Font("..\\..\\..\\Fonts\\MinecraftRegular.otf");
@@ -30,6 +31,7 @@ public static class Data
     public static readonly Texture background2 = new Texture("..\\..\\..\\Backgrounds\\Forest.jpg");
     public static readonly Texture background3 = new Texture("..\\..\\..\\Backgrounds\\Wood.jpg");
     public static readonly Texture background4 = new Texture("..\\..\\..\\Backgrounds\\House.jpg");
+    public static readonly Texture background5 = new Texture("..\\..\\..\\Backgrounds\\Cave.jpg");
 
     public static readonly Texture platformSize3 = new Texture("..\\..\\..\\Backgrounds\\Forest.jpg");
     public static readonly Texture platformSize5 = new Texture("..\\..\\..\\Backgrounds\\Wood.jpg");
@@ -44,12 +46,14 @@ public static class Data
 
     public static Dictionary<string, Texture> GUIDict = new Dictionary<string, Texture>
     {
+        { "WoodWall", new Texture("..\\..\\..\\Texture\\WoodPlanks\\tile1.png") },
         { "Pane1", new Texture("..\\..\\..\\Texture\\GUI\\Pane.png") },
         { "Button1", new Texture("..\\..\\..\\Texture\\GUI\\Button.png") },
         { "Button2", new Texture("..\\..\\..\\Texture\\GUI\\WoodButton.png") },
         { "Button3", new Texture("..\\..\\..\\Texture\\GUI\\StoneButton.png") },
         { "Button4", new Texture("..\\..\\..\\Texture\\GUI\\FireButton.png") },
         { "Button5", new Texture("..\\..\\..\\Texture\\GUI\\IceButton.png") },
+        { "Button6", new Texture("..\\..\\..\\Texture\\GUI\\DeleteButton.png") },
         { "LogOut", new Texture("..\\..\\..\\Texture\\GUI\\LogOut.png") },
         { "ArrowRight", new Texture("..\\..\\..\\Texture\\GUI\\ArrowRight.png") },
         { "ArrowLeft", new Texture("..\\..\\..\\Texture\\GUI\\ArrowLeft.png") },
